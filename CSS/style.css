@@ -1,0 +1,98 @@
+/* Custom Properties */
+
+.light-mode {
+  --color-sun: #242424;
+  --color-moon: #8a8888;
+  --bg-body: rgb(245, 245, 245);
+  --color-main: 0, 0, 0;
+  --bg-tertiary: #c4cac8;
+  --color-stats: #004242;
+}
+
+.dark-mode {
+  --bg-tertiary: #292d36;
+  --color-sun: #5c5d61;
+  --color-moon: #dcddde;
+  --bg-body: rgb(23, 26, 31);
+  --color-main: 221, 221, 221;
+  --color-stats: #b4b4b4;
+}
+
+/* CSS Reset */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  line-height: calc(1em + 0.5rem);
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+.mode-toggle {
+  position: absolute;
+  width: 80px;
+  height: 50px;
+  right: 0.75em;
+  top: 0.5em;
+  border-radius: 10px;
+  display: flex;
+  gap: 1px;
+  overflow: hidden;
+}
+
+.mode {
+  display: grid;
+  place-items: center;
+  padding: 0.9em 0;
+  height: 100%;
+  flex-grow: 1;
+  background-color: var(--bg-tertiary);
+  cursor: pointer;
+}
+
+.fa-sun {
+  color: var(--color-sun);
+  background: transparent;
+}
+
+.fa-moon {
+  color: var(--color-moon);
+  transform: rotate(-25deg);
+  background: transparent;
+}
