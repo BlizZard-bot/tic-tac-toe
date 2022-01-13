@@ -1,4 +1,14 @@
 /* Custom Properties */
+:root {
+  --step--2: clamp(0.69rem, 0.71rem + -0.07vw, 0.58rem);
+  --step--1: clamp(0.83rem, 0.83rem + 0.03vw, 0.88rem);
+  --step-0: clamp(1rem, 0.96rem + 0.19vw, 1.31rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.46vw, 1.97rem);
+  --step-2: clamp(1.44rem, 1.25rem + 0.91vw, 2.95rem);
+  --step-3: clamp(1.73rem, 1.39rem + 1.62vw, 4.43rem);
+  --step-4: clamp(2.07rem, 1.51rem + 2.74vw, 6.64rem);
+  --step-5: clamp(2.49rem, 1.56rem + 4.48vw, 9.97rem);
+}
 
 .light-mode {
   --color-sun: #242424;
@@ -36,6 +46,10 @@ body {
 body {
   line-height: calc(1em + 0.5rem);
   -webkit-font-smoothing: antialiased;
+  font-family: "Roboto";
+  display: grid;
+  padding: 1em;
+  font-size: var(--step-0);
 }
 
 img,
@@ -54,7 +68,10 @@ select {
   font: inherit;
 }
 
-p,
+p {
+  overflow-wrap: break-word;
+}
+
 h1,
 h2,
 h3,
@@ -62,14 +79,18 @@ h4,
 h5,
 h6 {
   overflow-wrap: break-word;
+  font-family: "Oswald";
+  font-size: var(--step-5);
 }
+
+/* Mode toggle styles */
 
 .mode-toggle {
   position: absolute;
-  width: 80px;
-  height: 50px;
-  right: 0.75em;
   top: 0.5em;
+  right: 0.5em;
+  width: 5rem;
+  height: 3rem;
   border-radius: 10px;
   display: flex;
   gap: 1px;
@@ -79,7 +100,7 @@ h6 {
 .mode {
   display: grid;
   place-items: center;
-  padding: 0.9em 0;
+  padding: 1em 0;
   height: 100%;
   flex-grow: 1;
   background-color: var(--bg-tertiary);
@@ -95,4 +116,180 @@ h6 {
   color: var(--color-moon);
   transform: rotate(-25deg);
   background: transparent;
+}
+
+/* Header styles */
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.main-heading {
+  font-size: 3rem;
+}
+
+.help-prompt {
+  text-align: center;
+  font-size: var(--step-3);
+  font-weight: bold;
+  margin-block: 1.85em 1em;
+}
+
+/* Starting section styles */
+
+.main {
+  margin-bottom: 3em;
+}
+
+.starting-page,
+.game-section {
+  display: grid;
+  gap: 2em;
+}
+
+.game-section {
+  margin-top: 5em;
+}
+
+.main-game {
+  display: grid;
+  place-content: center;
+  gap: 3em;
+}
+
+/* Main section styles */
+.return-btn {
+  position: absolute;
+  left: 1em;
+  top: 1em;
+  font-size: var(--step--1);
+}
+
+.active-player-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  gap: 1em;
+}
+
+.active-player-display button {
+  border-radius: 10px;
+  pointer-events: none;
+  font-size: var(--step-1);
+}
+
+.active-player {
+  background-color: lightpink;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1em;
+  max-width: 800px;
+}
+
+.main-grid > div {
+  padding: 2.8em;
+  border-radius: 10px;
+  background-color: rgb(238, 238, 238);
+  transition: 0.2s all ease-out;
+}
+
+.main-grid > div:hover {
+  transition: 0.2s all ease-out;
+  scale: 1.1;
+  background-color: #ccc;
+}
+
+/* Card styles */
+
+.player-card {
+  background-color: #f4f4f4;
+  max-width: 500px;
+  display: grid;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.player-selection {
+  padding: 0.35em;
+  text-align: center;
+  font-size: 2rem;
+  background-color: #ccc;
+  align-self: center;
+  font-weight: 800;
+  width: 100%;
+}
+
+.fa-user,
+.fa-robot {
+  --color-secondary: #000;
+  text-align: center;
+  display: inline-block;
+  width: 100%;
+  font-size: 8rem;
+  padding-block: 0.2em;
+  color: var(--color-secondary);
+}
+
+.start-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5em;
+}
+
+.start-game h2 {
+  font-size: var(--step-3);
+}
+
+/* Button styles */
+
+.btn-container {
+  display: flex;
+  justify-content: space-around;
+  gap: 0.5em;
+  padding-bottom: 1.5em;
+}
+
+button {
+  padding: 0.5em 1em;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  background: #919294;
+  transition: 0.3s all ease-out;
+  cursor: pointer;
+}
+
+button:hover {
+  transition: 0.3s all ease-out;
+  scale: 1.2;
+}
+
+/* Footer styles */
+
+footer {
+  margin-block-start: auto;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (min-width: 500px) {
+  .main-heading {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .active-player-display {
+    flex-direction: row;
+  }
+  .main-grid > div {
+    padding: 3.5em;
+  }
 }
