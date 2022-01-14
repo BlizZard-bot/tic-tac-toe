@@ -11,21 +11,39 @@
 }
 
 .light-mode {
-  --color-sun: #242424;
-  --color-moon: #8a8888;
-  --bg-body: rgb(245, 245, 245);
-  --color-main: 0, 0, 0;
-  --bg-tertiary: #c4cac8;
-  --color-stats: #004242;
+  --bg-body: #fff;
+  --color-main: #000;
+  --color-heading: #1f1235;
+  --color-subheading: #1b1425;
+  --bg-btn: #ff6e6c;
+  --color-btn: #1f1235;
+  --bg-btn-secondary: #ffc5c4;
+  --color-btn-secondary: #231d2c;
+  --bg-toggle: #ffffff;
+  --border-toggle: #1f1235;
+  --bg-sun: #ff6e6c;
+  --bg-moon: #fdbab9;
+  --marker-color: hsl(259, 24%, 44%);
+  --bg-cell: #cccccc;
+  --bg-cell-hover: #a8a7a7;
 }
 
 .dark-mode {
-  --bg-tertiary: #292d36;
-  --color-sun: #5c5d61;
-  --color-moon: #dcddde;
-  --bg-body: rgb(23, 26, 31);
-  --color-main: 221, 221, 221;
-  --color-stats: #b4b4b4;
+  --bg-body: #0f0e17;
+  --color-main: #a7a9be;
+  --color-heading: #fffffe;
+  --color-subheading: #d8d8d7;
+  --bg-btn: #ff8906;
+  --color-btn: #fffffe;
+  --bg-btn-secondary: #ffbe73aa;
+  --color-btn-secondary: #1f1616;
+  --bg-toggle: #fffffe;
+  --border-toggle: black;
+  --bg-sun: #ffcb90;
+  --bg-moon: #ff8906;
+  --marker-color: #f25f4c;
+  --bg-cell: #9b9b9b;
+  --bg-cell-hover: #e0e0e0;
 }
 
 /* CSS Reset */
@@ -50,6 +68,7 @@ body {
   display: grid;
   padding: 1em;
   font-size: var(--step-0);
+  background-color: var(--bg-body);
 }
 
 img,
@@ -70,6 +89,7 @@ select {
 
 p {
   overflow-wrap: break-word;
+  color: var(--color-main);
 }
 
 h1,
@@ -81,6 +101,7 @@ h6 {
   overflow-wrap: break-word;
   font-family: "Oswald";
   font-size: var(--step-5);
+  color: var(--color-subheading);
 }
 
 /* Mode toggle styles */
@@ -90,30 +111,36 @@ h6 {
   top: 0.5em;
   right: 0.5em;
   width: 5rem;
-  height: 3rem;
+  height: 3.2rem;
   border-radius: 10px;
   display: flex;
   gap: 1px;
   overflow: hidden;
+  background-color: var(--bg-toggle);
+  border: 2px solid var(--border-toggle);
 }
 
 .mode {
   display: grid;
   place-items: center;
-  padding: 1em 0;
-  height: 100%;
+  padding: 1em 0.5em;
+  min-height: 100%;
   flex-grow: 1;
   background-color: var(--bg-tertiary);
   cursor: pointer;
 }
 
+.mode-border {
+  border-right: 2px solid var(--border-toggle);
+}
+
 .fa-sun {
-  color: var(--color-sun);
+  color: var(--bg-sun);
   background: transparent;
 }
 
 .fa-moon {
-  color: var(--color-moon);
+  color: var(--bg-moon);
   transform: rotate(-25deg);
   background: transparent;
 }
@@ -123,16 +150,20 @@ h6 {
 .header {
   display: flex;
   align-items: center;
+  padding: 0.5em 0;
 }
 
 .main-heading {
-  font-size: 3rem;
+  font-size: var(--step-5);
+  color: var(--color-heading);
+  font-variant: small-caps;
 }
 
 .help-prompt {
   text-align: center;
   font-size: var(--step-3);
   font-weight: bold;
+  font-variant: small-caps;
   margin-block: 1.85em 1em;
 }
 
@@ -146,6 +177,10 @@ h6 {
 .game-section {
   display: grid;
   gap: 2em;
+}
+
+.starting-page {
+  place-items: center;
 }
 
 .game-section {
@@ -180,8 +215,9 @@ h6 {
   font-size: var(--step-1);
 }
 
-.active-player {
-  background-color: lightpink;
+.active-player.active-player {
+  background-color: var(--bg-btn);
+  color: var(--color-btn);
 }
 
 .main-grid {
@@ -194,30 +230,33 @@ h6 {
 .main-grid > div {
   padding: 2.8em;
   border-radius: 10px;
-  background-color: rgb(238, 238, 238);
+  background-color: var(--bg-cell);
   transition: 0.2s all ease-out;
 }
 
-.main-grid > div:hover {
+.main-grid > div:hover,
+.main-grid > div:focus-visible {
   transition: 0.2s all ease-out;
   scale: 1.1;
-  background-color: #ccc;
+  background-color: var(--bg-cell-hover);
 }
 
 /* Card styles */
 
 .player-card {
   background-color: #f4f4f4;
-  max-width: 500px;
   display: grid;
+  max-width: 360px;
   border-radius: 10px;
   overflow: hidden;
+  width: 100%;
 }
 
 .player-selection {
   padding: 0.35em;
   text-align: center;
   font-size: 2rem;
+  color: var(--marker-color);
   background-color: #ccc;
   align-self: center;
   font-weight: 800;
@@ -230,7 +269,7 @@ h6 {
   text-align: center;
   display: inline-block;
   width: 100%;
-  font-size: 8rem;
+  font-size: clamp(6rem, 10vw + 1rem, 12rem);
   padding-block: 0.2em;
   color: var(--color-secondary);
 }
@@ -256,18 +295,34 @@ h6 {
 }
 
 button {
-  padding: 0.5em 1em;
+  padding: 0.4em 1em;
   border: none;
   outline: none;
   border-radius: 10px;
-  background: #919294;
+  background: var(--bg-btn);
+  color: var(--color-btn);
   transition: 0.3s all ease-out;
   cursor: pointer;
 }
 
-button:hover {
+button:hover,
+button:focus-visible {
   transition: 0.3s all ease-out;
-  scale: 1.2;
+  scale: 1.3;
+}
+
+.btn-secondary {
+  background-color: var(--bg-btn-secondary);
+  color: var(--color-btn-secondary);
+  transition: 0.2s all ease-out;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
+  transition: 0.2s all ease-out;
+  background-color: var(--bg-btn);
+  color: var(--color-btn);
+  scale: 1.4;
 }
 
 /* Footer styles */
@@ -277,11 +332,17 @@ footer {
   text-align: center;
 }
 
+footer a {
+  text-decoration: none;
+  color: var(--color-heading);
+  font-weight: 500;
+}
+
 .hidden {
   display: none;
 }
 
-@media (min-width: 500px) {
+@media (min-width: 700px) {
   .main-heading {
     margin-inline: auto;
     text-align: center;
@@ -289,7 +350,13 @@ footer {
   .active-player-display {
     flex-direction: row;
   }
+  .player-card {
+    max-width: 450px;
+  }
   .main-grid > div {
     padding: 3.5em;
+  }
+  .starting-page {
+    grid-template-columns: 2fr 1fr 2fr;
   }
 }
