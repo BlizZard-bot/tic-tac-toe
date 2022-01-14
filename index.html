@@ -18,50 +18,52 @@
     ></script>
     <script src="./index.js" defer></script>
   </head>
-  <body class="dark-mode">
-    <header class="header hidden">
+  <body class="light-mode">
+    <header class="header">
       <h1 class="main-heading">Tic Tac Toe</h1>
     </header>
     <div class="mode-toggle">
-      <div class="mode"><i class="fas fa-sun light-toggle"></i></div>
+      <div class="mode mode-border">
+        <i class="fas fa-sun light-toggle"></i>
+      </div>
       <div class="mode"><i class="far fa-moon dark-toggle"></i></div>
     </div>
-    <h2 class="help-prompt hidden">Choose your players</h2>
+    <h2 class="help-prompt">Choose your players</h2>
     <main class="main">
-      <section class="starting-page hidden">
+      <section class="starting-page">
         <div class="player-card">
-          <p class="player-selection">X</p>
+          <h3 class="player-selection">X</h3>
           <div class="player-display">
             <i class="fas fa-user"></i>
           </div>
           <div class="btn-container">
-            <button>Player</button>
-            <button>Bot</button>
+            <button class="btn-secondary">Player</button>
+            <button class="btn-secondary">Bot</button>
           </div>
         </div>
         <div class="start-game">
           <h2>V/S</h2>
-          <button class="start-game-btn hidden">Start Game</button>
+          <button class="start-game-btn">Start Game</button>
         </div>
         <div class="player-card">
-          <p class="player-selection">O</p>
+          <h3 class="player-selection">O</h3>
           <div class="player-display">
             <i class="fas fa-robot"></i>
           </div>
           <div class="btn-container">
-            <button>Player</button>
-            <button>Bot</button>
+            <button class="btn-secondary">Player</button>
+            <button class="btn-secondary">Bot</button>
           </div>
         </div>
       </section>
-      <section class="game-section">
+      <section class="game-section hidden">
         <button class="return-btn">RETURN</button>
         <div class="main-game">
           <div class="active-player-display">
-            <button class="first-player">
+            <button class="first-player btn-secondary">
               Player One: <span class="player-one-score">0</span>
             </button>
-            <button class="second-player">
+            <button class="second-player btn-secondary">
               Player Two: <span class="player-two-score">0</span>
             </button>
           </div>
