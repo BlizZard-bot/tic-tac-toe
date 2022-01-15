@@ -13,52 +13,6 @@
 })();
 
 // Main functionality
-
-// GameBoard
-const gameBoard = (() => {
-  const gameBoardArr = [];
-  return { gameBoardArr };
-})();
-
-// Player factory
-const Player = (type, marker) => {
-  return { type, marker };
-};
-
-// Display Control
-
-const displayController = (() => {
-  const displayMarkerOnClick = () => {
-    const gameBoardArr = gameBoard.gameBoardArr;
-    const mainGrid = document.querySelector(".main-grid");
-    mainGrid.addEventListener("click", (e) => {
-      if (e.target.classList.contains("grid-cell")) {
-        displayMarker(e.target, gameBoardArr);
-      }
-    });
-  };
-
-  const displayMarker = (cell, gameBoardArr) => {
-    for (let i in gameBoardArr) {
-      if (+cell.getAttribute("data-number") - 1 === +i) {
-        cell.textContent = gameBoardArr[i];
-        showMarkerColor(cell);
-      }
-    }
-  };
-
-  const showMarkerColor = (cell) => {
-    if (cell.textContent === "X") {
-      cell.style.color = "var(--bg-btn)";
-    } else {
-      cell.style.color = "var(--marker-color)";
-    }
-  };
-  return { displayMarkerOnClick };
-})();
-
-displayController.displayMarkerOnClick();
-
 const gameControl = (() => {
   const players = {};
   function returnToHomePage() {
@@ -141,10 +95,69 @@ const gameControl = (() => {
     }
   }
 
-  const getPlayers = () => players;
-
-  return { setPlayerData, moveToGame, getPlayers };
+  return { setPlayerData, moveToGame, players };
 })();
 
 gameControl.setPlayerData();
 gameControl.moveToGame();
+
+// GameBoard
+const gameBoard = (() => {
+  const players = gameControl.players;
+  let currentPlayer = players.playerOne;
+  const gameBoardArr = [];
+  const switchMarker = () => {
+    if (currentPlayer === players.playerOne) {
+      currentPlayer = players.playerTwo;
+    } else {
+      currentPlayer = players.playerOne;
+    }
+  };
+  const populateBoardArr = (currentPlayer) => {
+    gameBoardArr.push(currentPlayer.marker);
+  };
+
+  return { gameBoardArr, populateBoardArr, switchMarker, currentPlayer };
+})();
+
+// Player factory
+const Player = (type, marker) => {
+  return { type, marker };
+};
+
+// Display Control
+
+const displayController = (() => {
+  const displayMarkerOnClick = () => {
+    const gameBoardArr = gameBoard.gameBoardArr;
+    const mainGrid = document.querySelector(".main-grid");
+    mainGrid.addEventListener("click", (e) => {
+      if (e.target.classList.contains("grid-cell")) {
+        let currentPlayer = gameBoard.currentPlayer;
+        gameBoard.populateBoardArr(currentPlayer);
+        gameBoard.switchMarker();
+        displayMarker(e.target, gameBoardArr);
+      }
+    });
+  };
+
+  const displayMarker = (cell, gameBoardArr) => {
+    for (let i in gameBoardArr) {
+      if (+cell.getAttribute("data-number") - 1 === +i) {
+        cell.textContent = gameBoardArr[i];
+        showMarkerColor(cell);
+      }
+    }
+  };
+
+  const showMarkerColor = (cell) => {
+    if (cell.textContent === "X") {
+      cell.style.color = "var(--bg-btn)";
+    } else {
+      cell.style.color = "var(--marker-color)";
+    }
+  };
+  return { displayMarkerOnClick };
+})();
+
+displayController.displayMarkerOnClick();
