@@ -95,7 +95,9 @@ const gameControl = (() => {
     }
   }
 
-  return { setPlayerData, moveToGame, players };
+  const getPlayers = () => players;
+
+  return { setPlayerData, moveToGame, getPlayers };
 })();
 
 gameControl.setPlayerData();
@@ -103,7 +105,7 @@ gameControl.moveToGame();
 
 // GameBoard
 const gameBoard = (() => {
-  const players = gameControl.players;
+  const players = gameControl.getPlayers();
   let currentPlayer = players.playerOne;
   const gameBoardArr = [];
   const switchMarker = () => {
@@ -113,11 +115,13 @@ const gameBoard = (() => {
       currentPlayer = players.playerOne;
     }
   };
-  const populateBoardArr = (currentPlayer) => {
+  const populateBoardArr = () => {
     gameBoardArr.push(currentPlayer.marker);
   };
 
-  return { gameBoardArr, populateBoardArr, switchMarker, currentPlayer };
+  const getGameboardArr = () => gameBoardArr;
+
+  return { getGameboardArr, populateBoardArr, switchMarker };
 })();
 
 // Player factory
@@ -129,12 +133,11 @@ const Player = (type, marker) => {
 
 const displayController = (() => {
   const displayMarkerOnClick = () => {
-    const gameBoardArr = gameBoard.gameBoardArr;
+    const gameBoardArr = gameBoard.getGameboardArr();
     const mainGrid = document.querySelector(".main-grid");
     mainGrid.addEventListener("click", (e) => {
       if (e.target.classList.contains("grid-cell")) {
-        let currentPlayer = gameBoard.currentPlayer;
-        gameBoard.populateBoardArr(currentPlayer);
+        gameBoard.populateBoardArr();
         gameBoard.switchMarker();
         displayMarker(e.target, gameBoardArr);
       }
