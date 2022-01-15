@@ -24,7 +24,7 @@
   --bg-sun: #ff6e6c;
   --bg-moon: #fdbab9;
   --marker-color: hsl(259, 24%, 44%);
-  --bg-cell: #cccccc;
+  --bg-cell: #e6e6e6;
   --bg-cell-hover: #a8a7a7;
 }
 
@@ -42,7 +42,7 @@
   --bg-sun: #ffcb90;
   --bg-moon: #ff8906;
   --marker-color: #f25f4c;
-  --bg-cell: #9b9b9b;
+  --bg-cell: #c3c3c3;
   --bg-cell-hover: #e0e0e0;
 }
 
@@ -224,14 +224,19 @@ h6 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1em;
-  max-width: 800px;
+  width: 90vw;
+  max-width: 425px;
 }
 
 .main-grid > div {
-  padding: 2.8em;
-  border-radius: 10px;
+  aspect-ratio: 1;
+  font-size: var(--step-3);
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
   background-color: var(--bg-cell);
   transition: 0.2s all ease-out;
+  font-weight: 500;
 }
 
 .main-grid > div:hover,
@@ -325,6 +330,12 @@ button:focus-visible {
   scale: 1.4;
 }
 
+.selected {
+  background-color: var(--bg-btn);
+  color: var(--color-btn);
+  scale: 1.4;
+}
+
 /* Footer styles */
 
 footer {
@@ -352,9 +363,6 @@ footer a {
   }
   .player-card {
     max-width: 450px;
-  }
-  .main-grid > div {
-    padding: 3.5em;
   }
   .starting-page {
     grid-template-columns: 2fr 1fr 2fr;
