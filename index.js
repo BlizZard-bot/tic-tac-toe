@@ -122,11 +122,13 @@ const gameBoard = (() => {
   let players;
   let currentPlayer;
   const gameBoardArr = [];
-  const switchMarker = () => {
-    if (currentPlayer === players.playerOne) {
-      currentPlayer = players.playerTwo;
-    } else {
-      currentPlayer = players.playerOne;
+  const switchMarker = (cell) => {
+    if (cell.textContent === "") {
+      if (currentPlayer === players.playerOne) {
+        currentPlayer = players.playerTwo;
+      } else {
+        currentPlayer = players.playerOne;
+      }
     }
   };
   const populateBoardArr = (cell) => {
@@ -164,7 +166,7 @@ const displayController = (() => {
     mainGrid.addEventListener("click", (e) => {
       if (e.target.classList.contains("grid-cell")) {
         gameBoard.populateBoardArr(e.target);
-        gameBoard.switchMarker();
+        gameBoard.switchMarker(e.target);
         displayMarker(e.target, gameBoardArr);
         let activePlayer = gameBoard.getCurrentPlayer();
         displayActivePlayer(activePlayer);
@@ -174,7 +176,10 @@ const displayController = (() => {
 
   const displayMarker = (cell, gameBoardArr) => {
     for (let i in gameBoardArr) {
-      if (+cell.getAttribute("data-number") - 1 === +i) {
+      if (
+        +cell.getAttribute("data-number") - 1 === +i &&
+        cell.textContent === ""
+      ) {
         cell.textContent = gameBoardArr[i];
         showMarkerColor(cell);
       }
@@ -192,7 +197,6 @@ const displayController = (() => {
   const displayActivePlayer = (currentPlayer) => {
     const firstPlayerDisplay = document.querySelector(".first-player");
     const secondPlayerDisplay = document.querySelector(".second-player");
-    console.log(currentPlayer.marker);
     if (currentPlayer.marker === "X") {
       firstPlayerDisplay.classList.add("selected");
       secondPlayerDisplay.classList.remove("selected");
