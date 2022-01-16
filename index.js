@@ -57,14 +57,14 @@ const gameControl = (() => {
     }
   }
 
-  function setPlayerData() {
+  function getPlayerData() {
     const startingPage = document.querySelector(".starting-page");
     startingPage.addEventListener("click", (e) => {
-      getPlayerData(e.target, players);
+      setPlayerData(e.target, players);
     });
   }
 
-  function getPlayerData(item, players) {
+  function setPlayerData(item, players) {
     if (item.textContent === "Player" || item.textContent === "Bot") {
       const marker =
         item.parentElement.parentElement.firstElementChild.textContent;
@@ -76,6 +76,8 @@ const gameControl = (() => {
         players.playerTwo = Player(type, marker);
       }
     }
+    gameBoard.setPlayers(players);
+    gameBoard.setCurrentPlayer(players.playerOne);
     console.log(players);
   }
 
@@ -97,16 +99,16 @@ const gameControl = (() => {
 
   const getPlayers = () => players;
 
-  return { setPlayerData, moveToGame, getPlayers };
+  return { getPlayerData, moveToGame, getPlayers };
 })();
 
-gameControl.setPlayerData();
+gameControl.getPlayerData();
 gameControl.moveToGame();
 
 // GameBoard
 const gameBoard = (() => {
-  const players = gameControl.getPlayers();
-  let currentPlayer = players.playerOne;
+  let players;
+  let currentPlayer;
   const gameBoardArr = [];
   const switchMarker = () => {
     if (currentPlayer === players.playerOne) {
@@ -115,13 +117,25 @@ const gameBoard = (() => {
       currentPlayer = players.playerOne;
     }
   };
-  const populateBoardArr = () => {
-    gameBoardArr.push(currentPlayer.marker);
+  const populateBoardArr = (cell) => {
+    const index = +cell.getAttribute("data-number") - 1;
+    gameBoardArr[index] = currentPlayer.marker;
   };
 
   const getGameboardArr = () => gameBoardArr;
 
-  return { getGameboardArr, populateBoardArr, switchMarker };
+  const setCurrentPlayer = (player) => (currentPlayer = player);
+  const setPlayers = (playerData) => (players = playerData);
+  const getCurrentPlayer = () => currentPlayer;
+
+  return {
+    getGameboardArr,
+    populateBoardArr,
+    switchMarker,
+    setCurrentPlayer,
+    getCurrentPlayer,
+    setPlayers,
+  };
 })();
 
 // Player factory
@@ -137,9 +151,11 @@ const displayController = (() => {
     const mainGrid = document.querySelector(".main-grid");
     mainGrid.addEventListener("click", (e) => {
       if (e.target.classList.contains("grid-cell")) {
-        gameBoard.populateBoardArr();
+        gameBoard.populateBoardArr(e.target);
         gameBoard.switchMarker();
         displayMarker(e.target, gameBoardArr);
+        let activePlayer = gameBoard.getCurrentPlayer();
+        displayActivePlayer(activePlayer);
       }
     });
   };
@@ -158,6 +174,19 @@ const displayController = (() => {
       cell.style.color = "var(--bg-btn)";
     } else {
       cell.style.color = "var(--marker-color)";
+    }
+  };
+
+  const displayActivePlayer = (currentPlayer) => {
+    const firstPlayerDisplay = document.querySelector(".first-player");
+    const secondPlayerDisplay = document.querySelector(".second-player");
+    console.log(currentPlayer.marker);
+    if (currentPlayer.marker === "X") {
+      firstPlayerDisplay.classList.add("selected");
+      secondPlayerDisplay.classList.remove("selected");
+    } else {
+      firstPlayerDisplay.classList.remove("selected");
+      secondPlayerDisplay.classList.add("selected");
     }
   };
   return { displayMarkerOnClick };
