@@ -60,25 +60,37 @@ const gameControl = (() => {
   function getPlayerData() {
     const startingPage = document.querySelector(".starting-page");
     startingPage.addEventListener("click", (e) => {
-      setPlayerData(e.target, players);
+      if (e.target.textContent === "Player" || e.target.textContent === "Bot") {
+        setPlayerData(e.target, players);
+        changeIconOnSelection(e.target);
+      }
     });
   }
 
   function setPlayerData(item, players) {
-    if (item.textContent === "Player" || item.textContent === "Bot") {
-      const marker =
-        item.parentElement.parentElement.firstElementChild.textContent;
-      const type = item.textContent;
-      styleSelectedButton(item);
-      if (marker === "X") {
-        players.playerOne = Player(type, marker);
-      } else {
-        players.playerTwo = Player(type, marker);
-      }
+    const marker =
+      item.parentElement.parentElement.firstElementChild.textContent;
+    const type = item.textContent;
+    styleSelectedButton(item);
+    if (marker === "X") {
+      players.playerOne = Player(type, marker);
+    } else {
+      players.playerTwo = Player(type, marker);
     }
     gameBoard.setPlayers(players);
     gameBoard.setCurrentPlayer(players.playerOne);
     console.log(players);
+  }
+
+  function changeIconOnSelection(item) {
+    const icon = item.parentElement.parentElement.querySelector("i");
+    if (item.textContent === "Player") {
+      icon.classList.remove("fa-robot");
+      icon.classList.add("fa-user");
+    } else {
+      icon.classList.add("fa-robot");
+      icon.classList.remove("fa-user");
+    }
   }
 
   function styleSelectedButton(button) {
