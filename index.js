@@ -137,8 +137,12 @@ const gameBoard = (() => {
   };
 
   const checkForWin = () => {
-    if (checkForHorizontalWin(gameBoard, currentPlayer)) {
-      return true;
+    let hasWon = false;
+    if (
+      checkForHorizontalWin(gameBoard, currentPlayer) ||
+      checkForVerticalWin(gameBoard, currentPlayer)
+    ) {
+      hasWon = true;
     }
   };
 
@@ -149,6 +153,23 @@ const gameBoard = (() => {
       let i = 0, j = i + 1, k = j + 1;
       i < arr.length, j < arr.length, k < arr.length;
       i += 3, j += 3, k += 3
+    ) {
+      if (
+        player.marker === arr[i] &&
+        player.marker === arr[j] &&
+        player.marker === arr[k]
+      ) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const checkForVerticalWin = (arr, player) => {
+    for (
+      let i = 0, j = i + 3, k = j + 3;
+      i < arr.length, j < arr.length, k < arr.length;
+      i++, j++, k++
     ) {
       if (
         player.marker === arr[i] &&
@@ -195,7 +216,7 @@ const displayController = (() => {
         displayMarker(e.target, gameBoardArr);
         let activePlayer = gameBoard.getCurrentPlayer();
         displayActivePlayer(activePlayer);
-        checkForWin();
+        gameBoard.checkForWin();
       }
     });
   };
