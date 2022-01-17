@@ -141,7 +141,8 @@ const gameBoard = (() => {
     if (
       checkForHorizontalWin(gameBoard, currentPlayer) ||
       checkForVerticalWin(gameBoard, currentPlayer) ||
-      checkForRightDiagonalWin(gameBoard, currentPlayer)
+      checkForRightDiagonalWin(gameBoard, currentPlayer) ||
+      checkForLeftDiagonalWin(gameBoard, currentPlayer)
     ) {
       hasWon = true;
     }
@@ -183,11 +184,22 @@ const gameBoard = (() => {
     return false;
   };
 
-  const checkForRightDiagonalWin = (arr, player) => {
+  const checkForLeftDiagonalWin = (arr, player) => {
     if (
       arr[0] === player.marker &&
       arr[4] === player.marker &&
       arr[8] === player.marker
+    ) {
+      return true;
+    }
+    return false;
+  };
+
+  const checkForRightDiagonalWin = (arr, player) => {
+    if (
+      arr[2] === player.marker &&
+      arr[4] === player.marker &&
+      arr[6] === player.marker
     ) {
       return true;
     }
