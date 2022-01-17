@@ -139,72 +139,65 @@ const gameBoard = (() => {
   const checkForWin = () => {
     let hasWon = false;
     if (
-      checkForHorizontalWin(gameBoard, currentPlayer) ||
-      checkForVerticalWin(gameBoard, currentPlayer) ||
-      checkForRightDiagonalWin(gameBoard, currentPlayer) ||
-      checkForLeftDiagonalWin(gameBoard, currentPlayer)
+      checkForHorizontalWin ||
+      checkForVerticalWin ||
+      checkForRightDiagonalWin ||
+      checkForLeftDiagonalWin
     ) {
       hasWon = true;
     }
+    return hasWon;
+  };
+
+  const checkForCertainDirectionWin = (...args) => {
+    let [
+      firstIteratorVal,
+      secondIteratorVal,
+      thirdIteratorVal,
+      increment,
+      arr,
+      player,
+    ] = args;
+    for (
+      let i = firstIteratorVal, j = secondIteratorVal, k = thirdIteratorVal;
+      i < arr.length, j < arr.length, k < arr.length;
+      i += increment, j += increment, k += increment
+    ) {
+      if (increment > 0) {
+        if (
+          arr[i] === player.marker &&
+          arr[j] === player.marker &&
+          arr[k] === player.marker
+        ) {
+          return true;
+        }
+      } else {
+        if (
+          arr[i] === player.marker &&
+          arr[j] === player.marker &&
+          arr[k] === player.marker
+        ) {
+          return true;
+        }
+        return false;
+      }
+    }
+    return false;
   };
 
   // Vertical win always means that the three indices will be consecutive, start from 0,1,2 and
   // increase by 3 for future iterations. See Plan.md for further details
-  const checkForHorizontalWin = (arr, player) => {
-    for (
-      let i = 0, j = i + 1, k = j + 1;
-      i < arr.length, j < arr.length, k < arr.length;
-      i += 3, j += 3, k += 3
-    ) {
-      if (
-        player.marker === arr[i] &&
-        player.marker === arr[j] &&
-        player.marker === arr[k]
-      ) {
-        return true;
-      }
-    }
-    return false;
-  };
+  const checkForHorizontalWin = () =>
+    checkForCertainDirectionWin(0, 1, 2, 3, gameBoard, currentPlayer);
 
-  const checkForVerticalWin = (arr, player) => {
-    for (
-      let i = 0, j = i + 3, k = j + 3;
-      i < arr.length, j < arr.length, k < arr.length;
-      i++, j++, k++
-    ) {
-      if (
-        player.marker === arr[i] &&
-        player.marker === arr[j] &&
-        player.marker === arr[k]
-      ) {
-        return true;
-      }
-    }
-    return false;
-  };
+  const checkForVerticalWin = () =>
+    checkForCertainDirectionWin(0, 3, 6, 1, gameBoard, currentPlayer);
 
-  const checkForLeftDiagonalWin = (arr, player) => {
-    if (
-      arr[0] === player.marker &&
-      arr[4] === player.marker &&
-      arr[8] === player.marker
-    ) {
-      return true;
-    }
-    return false;
-  };
+  const checkForLeftDiagonalWin = () =>
+    checkForCertainDirectionWin(0, 4, 8, 0, gameBoard, currentPlayer);
 
-  const checkForRightDiagonalWin = (arr, player) => {
-    if (
-      arr[2] === player.marker &&
-      arr[4] === player.marker &&
-      arr[6] === player.marker
-    ) {
-      return true;
-    }
-    return false;
-  };
+  const checkForRightDiagonalWin = () =>
+    checkForCertainDirectionWin(2, 4, 6, 0, gameBoard, currentPlayer);
 
   const setPlayers = (playerData) => (players = playerData);
   const getGameboardArr = () => gameBoardArr;
