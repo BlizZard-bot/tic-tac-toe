@@ -137,14 +137,14 @@ const gameBoard = (() => {
   };
 
   const checkForWin = () => {
-    if (checkForVerticalWin(gameBoard, currentPlayer)) {
+    if (checkForHorizontalWin(gameBoard, currentPlayer)) {
       return true;
     }
   };
 
   // Vertical win always means that the three indices will be consecutive, start from 0,1,2 and
   // increase by 3 for future iterations. See Plan.md for further details
-  const checkForVerticalWin = (arr, player) => {
+  const checkForHorizontalWin = (arr, player) => {
     for (
       let i = 0, j = i + 1, k = j + 1;
       i < arr.length, j < arr.length, k < arr.length;
