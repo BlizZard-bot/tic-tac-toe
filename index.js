@@ -73,9 +73,9 @@ const gameControl = (() => {
     const type = item.textContent;
     styleSelectedButton(item);
     if (marker === "X") {
-      players.playerOne = Player(type, marker);
+      players.playerOne = Player(type, marker, "Player One");
     } else {
-      players.playerTwo = Player(type, marker);
+      players.playerTwo = Player(type, marker, "Player Two");
     }
     gameBoard.setPlayers(players);
     gameBoard.setCurrentPlayer(players.playerOne);
@@ -121,9 +121,10 @@ gameControl.moveToGame();
 const gameBoard = (() => {
   let players;
   let currentPlayer;
-  const gameBoardArr = ["", "", "", "", "", "", "", "", ""];
+  let gameBoardArr = ["", "", "", "", "", "", "", "", ""];
+  let winningIndices;
   const switchCurrentPlayer = (cell) => {
-    if (cell.textContent === "" && +cell.getAttribute("data-number") !== 9) {
+    if (cell.textContent === "") {
       if (currentPlayer === players.playerOne) {
         currentPlayer = players.playerTwo;
       } else {
@@ -136,7 +137,7 @@ const gameBoard = (() => {
     gameBoardArr[index] = currentPlayer.marker;
   };
 
-  const checkForWin = () => {
+  const checkForRoundWin = () => {
     // Storing whether wins have occurred(true or false) in variables
     let horizontalWin = checkForHorizontalWin();
     let verticalWin = checkForVerticalWin();
@@ -144,6 +145,11 @@ const gameBoard = (() => {
     let leftDiagonalWin = checkForLeftDiagonalWin();
     // If one is true return true, otherwise return false
     return horizontalWin || verticalWin || rightDiagonalWin || leftDiagonalWin;
+  };
+
+  const checkForRoundDraw = () => {
+    const cells = Array.from(document.querySelectorAll(".grid-cell"));
+    return cells.every((cell) => cell.textContent !== "");
   };
 
   const checkForCertainDirectionWin = (...args) => {
@@ -170,6 +176,7 @@ const gameBoard = (() => {
           arr[j] === player.marker &&
           arr[k] === player.marker
         ) {
+          winningIndices = [i, j, k];
           return true;
         }
         // Incorporating win conditions for diagonals
@@ -180,6 +187,7 @@ const gameBoard = (() => {
           arr[j] === player.marker &&
           arr[k] === player.marker
         ) {
+          winningIndices = [i, j, k];
           return true;
         }
         return false;
@@ -204,47 +212,56 @@ const gameBoard = (() => {
     checkForCertainDirectionWin(2, 4, 6, 0, gameBoardArr, currentPlayer);
 
   const setPlayers = (playerData) => (players = playerData);
+  const setGameboardArr = (arr) => (gameBoardArr = arr);
   const getGameboardArr = () => gameBoardArr;
   const setCurrentPlayer = (player) => (currentPlayer = player);
   const getCurrentPlayer = () => currentPlayer;
+  const getWinningIndices = () => winningIndices;
 
   return {
+    setGameboardArr,
     getGameboardArr,
     populateBoardArr,
     switchCurrentPlayer,
     setCurrentPlayer,
     getCurrentPlayer,
     setPlayers,
-    checkForWin,
+    getWinningIndices,
+    checkForRoundWin,
+    checkForRoundDraw,
   };
 })();
 
 // Player factory
-const Player = (type, marker) => {
-  return { type, marker, score: 0 };
+const Player = (type, marker, name) => {
+  return { type, marker, name, score: 0 };
 };
 
 // Display Control
 
 const displayController = (() => {
   const displayMarkerOnClick = () => {
-    const gameBoardArr = gameBoard.getGameboardArr();
     const mainGrid = document.querySelector(".main-grid");
     mainGrid.addEventListener("click", (e) => {
       if (
         e.target.classList.contains("grid-cell") &&
         e.target.textContent === ""
       ) {
+        let gameBoardArr = gameBoard.getGameboardArr();
         gameBoard.populateBoardArr(e.target);
-        let hasWon = gameBoard.checkForWin();
-        gameBoard.switchCurrentPlayer(e.target);
-        displayMarker(e.target, gameBoardArr);
-        if (hasWon) {
-          setTimeout(resetGrid.bind(null, gameBoardArr), 1000);
+        let hasWonRound = gameBoard.checkForRoundWin();
+        let hasDrawnRound = gameBoard.checkForRoundDraw();
+        let activePlayer = gameBoard.getCurrentPlayer();
+        if (hasWonRound) {
+          performRoundWinFunctions(activePlayer);
+        } else if (hasDrawnRound) {
+          console.log("Round drawn");
+          performRoundDrawFunctions();
         } else {
-          let activePlayer = gameBoard.getCurrentPlayer();
+          gameBoard.switchCurrentPlayer(e.target);
           displayActivePlayer(activePlayer);
         }
+        displayMarker(e.target, gameBoardArr);
       }
     });
   };
@@ -278,15 +295,69 @@ const displayController = (() => {
     }
   };
 
-  const resetGrid = (arr) => {
-    for (let item of arr) {
-      item = "";
+  const performRoundWinFunctions = (activePlayer) => {
+    let winningIndices = gameBoard.getWinningIndices();
+    toggleWinningCellsAnimation(winningIndices);
+    updatePlayerScore(activePlayer);
+    setTimeout(resetGame, 2100);
+  };
+
+  const performRoundDrawFunctions = () => {
+    document.querySelectorAll(".grid-cell").forEach((cell) => {
+      cell.classList.add("draw");
+      setTimeout(removeDrawClass.bind(null, cell), 2100);
+    });
+    setTimeout(resetGame, 2100);
+  };
+
+  const updatePlayerScore = (player) => {
+    player.score += 1;
+    if (player.name === "Player One") {
+      document.querySelector(".player-one-score").textContent = player.score;
+    } else {
+      document.querySelector(".player-two-score").textContent = player.score;
     }
+  };
+
+  const toggleWinningCellsAnimation = (indices) => {
+    const cells = Array.from(document.querySelectorAll(".grid-cell"));
+    const winningCells = cells.filter((cell) =>
+      indices.includes(+cell.getAttribute("data-number") - 1)
+    );
+    const nonWinningCells = cells.filter(
+      (cell) => !winningCells.includes(cell)
+    );
+    for (let winningCell of winningCells) {
+      winningCell.classList.add("winning-cell");
+      setTimeout(removeWinningClass.bind(null, winningCell), 2100);
+    }
+    nonWinningCells.forEach((cell) => {
+      cell.classList.add("no-events");
+      setTimeout(removePointerEvents.bind(null, cell), 2100);
+    });
+  };
+
+  const removePointerEvents = (cell) => {
+    cell.classList.remove("no-events");
+  };
+
+  const removeWinningClass = (winningCell) => {
+    winningCell.classList.remove("winning-cell");
+  };
+
+  const removeDrawClass = (cell) => {
+    cell.classList.remove("draw");
+  };
+
+  const resetGame = () => {
+    const emptyArr = ["", "", "", "", "", "", "", "", ""];
+    gameBoard.setGameboardArr(emptyArr);
     document
       .querySelectorAll(".grid-cell")
       .forEach((cell) => (cell.textContent = ""));
+    gameBoard.setCurrentPlayer(gameControl.getPlayers().playerOne);
   };
-  return { displayMarkerOnClick, resetGrid };
+  return { displayMarkerOnClick };
 })();
 
 displayController.displayMarkerOnClick();
