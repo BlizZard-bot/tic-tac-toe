@@ -144,7 +144,11 @@ const gameBoard = (() => {
     return horizontalWin || verticalWin || rightDiagonalWin || leftDiagonalWin;
   };
 
+  // Function checking for wins in given direction by taking the proper
+  // arguments
+
   const checkForCertainDirectionWin = (...args) => {
+    // Extracting values from the arguments using the rest operator
     let [
       firstIteratorVal,
       secondIteratorVal,
@@ -153,11 +157,14 @@ const gameBoard = (() => {
       arr,
       player,
     ] = args;
+    // Iterating over the loop based on common patterns in win conditions. See Plan.md for details
     for (
       let i = firstIteratorVal, j = secondIteratorVal, k = thirdIteratorVal;
       i < arr.length, j < arr.length, k < arr.length;
       i += increment, j += increment, k += increment
     ) {
+      // Checking if increment if more than 0 because if increment is less than 0 then it becomes an infinite loop
+      // as in the case of diagonals
       if (increment > 0) {
         if (
           arr[i] === player.marker &&
@@ -166,7 +173,9 @@ const gameBoard = (() => {
         ) {
           return true;
         }
+        // Incorporating win conditions for diagonals
       } else {
+        // Checking if all indices have the player's marker
         if (
           arr[i] === player.marker &&
           arr[j] === player.marker &&
@@ -180,8 +189,9 @@ const gameBoard = (() => {
     return false;
   };
 
-  // Horizontal win always means that the three indices will be consecutive, start from 0,1,2 and
-  // increase by 3 for future iterations. See Plan.md for further details
+  // Win conditions for different directions. See Plan.md for further details
+  // and illustrations
+
   const checkForHorizontalWin = () =>
     checkForCertainDirectionWin(0, 1, 2, 3, gameBoardArr, currentPlayer);
 
