@@ -121,9 +121,9 @@ gameControl.moveToGame();
 const gameBoard = (() => {
   let players;
   let currentPlayer;
-  const gameBoardArr = [];
-  const switchMarker = (cell) => {
-    if (cell.textContent === "") {
+  const gameBoardArr = ["", "", "", "", "", "", "", "", ""];
+  const switchCurrentPlayer = (cell) => {
+    if (cell.textContent === "" && +cell.getAttribute("data-number") !== 9) {
       if (currentPlayer === players.playerOne) {
         currentPlayer = players.playerTwo;
       } else {
@@ -137,16 +137,11 @@ const gameBoard = (() => {
   };
 
   const checkForWin = () => {
-    let hasWon = false;
-    if (
-      checkForHorizontalWin ||
-      checkForVerticalWin ||
-      checkForRightDiagonalWin ||
-      checkForLeftDiagonalWin
-    ) {
-      hasWon = true;
-    }
-    return hasWon;
+    let horizontalWin = checkForHorizontalWin();
+    let verticalWin = checkForVerticalWin();
+    let rightDiagonalWin = checkForRightDiagonalWin();
+    let leftDiagonalWin = checkForLeftDiagonalWin();
+    return horizontalWin || verticalWin || rightDiagonalWin || leftDiagonalWin;
   };
 
   const checkForCertainDirectionWin = (...args) => {
@@ -188,16 +183,16 @@ const gameBoard = (() => {
   // Vertical win always means that the three indices will be consecutive, start from 0,1,2 and
   // increase by 3 for future iterations. See Plan.md for further details
   const checkForHorizontalWin = () =>
-    checkForCertainDirectionWin(0, 1, 2, 3, gameBoard, currentPlayer);
+    checkForCertainDirectionWin(0, 1, 2, 3, gameBoardArr, currentPlayer);
 
   const checkForVerticalWin = () =>
-    checkForCertainDirectionWin(0, 3, 6, 1, gameBoard, currentPlayer);
+    checkForCertainDirectionWin(0, 3, 6, 1, gameBoardArr, currentPlayer);
 
   const checkForLeftDiagonalWin = () =>
-    checkForCertainDirectionWin(0, 4, 8, 0, gameBoard, currentPlayer);
+    checkForCertainDirectionWin(0, 4, 8, 0, gameBoardArr, currentPlayer);
 
   const checkForRightDiagonalWin = () =>
-    checkForCertainDirectionWin(2, 4, 6, 0, gameBoard, currentPlayer);
+    checkForCertainDirectionWin(2, 4, 6, 0, gameBoardArr, currentPlayer);
 
   const setPlayers = (playerData) => (players = playerData);
   const getGameboardArr = () => gameBoardArr;
@@ -207,7 +202,7 @@ const gameBoard = (() => {
   return {
     getGameboardArr,
     populateBoardArr,
-    switchMarker,
+    switchCurrentPlayer,
     setCurrentPlayer,
     getCurrentPlayer,
     setPlayers,
@@ -217,7 +212,7 @@ const gameBoard = (() => {
 
 // Player factory
 const Player = (type, marker) => {
-  return { type, marker };
+  return { type, marker, score: 0 };
 };
 
 // Display Control
@@ -227,23 +222,23 @@ const displayController = (() => {
     const gameBoardArr = gameBoard.getGameboardArr();
     const mainGrid = document.querySelector(".main-grid");
     mainGrid.addEventListener("click", (e) => {
-      if (e.target.classList.contains("grid-cell")) {
+      if (
+        e.target.classList.contains("grid-cell") &&
+        e.target.textContent === ""
+      ) {
         gameBoard.populateBoardArr(e.target);
-        gameBoard.switchMarker(e.target);
+        gameBoard.checkForWin();
+        gameBoard.switchCurrentPlayer(e.target);
         displayMarker(e.target, gameBoardArr);
         let activePlayer = gameBoard.getCurrentPlayer();
         displayActivePlayer(activePlayer);
-        gameBoard.checkForWin();
       }
     });
   };
 
   const displayMarker = (cell, gameBoardArr) => {
     for (let i in gameBoardArr) {
-      if (
-        +cell.getAttribute("data-number") - 1 === +i &&
-        cell.textContent === ""
-      ) {
+      if (+cell.getAttribute("data-number") - 1 === +i) {
         cell.textContent = gameBoardArr[i];
         showMarkerColor(cell);
       }
