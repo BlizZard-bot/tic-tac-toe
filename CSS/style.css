@@ -353,6 +353,32 @@ footer a {
   display: none;
 }
 
+.no-events {
+  pointer-events: none;
+}
+
+.winning-cell {
+  animation: 2s winning-ani forwards;
+}
+
+.draw {
+  animation: 2s draw-ani forwards;
+}
+
+@keyframes winning-ani {
+  to {
+    scale: 1.1;
+    background-color: lightgreen;
+  }
+}
+
+@keyframes draw-ani {
+  to {
+    scale: 1.1;
+    background-color: goldenrod;
+  }
+}
+
 @media (min-width: 700px) {
   .main-heading {
     margin-inline: auto;
