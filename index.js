@@ -180,7 +180,7 @@ const gameBoard = (() => {
     return false;
   };
 
-  // Vertical win always means that the three indices will be consecutive, start from 0,1,2 and
+  // Horizontal win always means that the three indices will be consecutive, start from 0,1,2 and
   // increase by 3 for future iterations. See Plan.md for further details
   const checkForHorizontalWin = () =>
     checkForCertainDirectionWin(0, 1, 2, 3, gameBoardArr, currentPlayer);
