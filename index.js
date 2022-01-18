@@ -137,15 +137,14 @@ const gameBoard = (() => {
   };
 
   const checkForWin = () => {
+    // Storing whether wins have occurred(true or false) in variables
     let horizontalWin = checkForHorizontalWin();
     let verticalWin = checkForVerticalWin();
     let rightDiagonalWin = checkForRightDiagonalWin();
     let leftDiagonalWin = checkForLeftDiagonalWin();
+    // If one is true return true, otherwise return false
     return horizontalWin || verticalWin || rightDiagonalWin || leftDiagonalWin;
   };
-
-  // Function checking for wins in given direction by taking the proper
-  // arguments
 
   const checkForCertainDirectionWin = (...args) => {
     // Extracting values from the arguments using the rest operator
@@ -237,11 +236,15 @@ const displayController = (() => {
         e.target.textContent === ""
       ) {
         gameBoard.populateBoardArr(e.target);
-        gameBoard.checkForWin();
+        let hasWon = gameBoard.checkForWin();
         gameBoard.switchCurrentPlayer(e.target);
         displayMarker(e.target, gameBoardArr);
-        let activePlayer = gameBoard.getCurrentPlayer();
-        displayActivePlayer(activePlayer);
+        if (hasWon) {
+          setTimeout(resetGrid.bind(null, gameBoardArr), 1000);
+        } else {
+          let activePlayer = gameBoard.getCurrentPlayer();
+          displayActivePlayer(activePlayer);
+        }
       }
     });
   };
@@ -274,7 +277,16 @@ const displayController = (() => {
       secondPlayerDisplay.classList.add("selected");
     }
   };
-  return { displayMarkerOnClick };
+
+  const resetGrid = (arr) => {
+    for (let item of arr) {
+      item = "";
+    }
+    document
+      .querySelectorAll(".grid-cell")
+      .forEach((cell) => (cell.textContent = ""));
+  };
+  return { displayMarkerOnClick, resetGrid };
 })();
 
 displayController.displayMarkerOnClick();
