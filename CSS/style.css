@@ -201,6 +201,11 @@ h6 {
   font-size: var(--step--1);
 }
 
+.win-message {
+  text-align: center;
+  margin-bottom: 0.4em;
+}
+
 .active-player-display {
   display: flex;
   flex-direction: column;
