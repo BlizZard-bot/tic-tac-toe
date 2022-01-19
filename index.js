@@ -79,7 +79,6 @@ const gameControl = (() => {
     }
     gameBoard.setPlayers(players);
     gameBoard.setCurrentPlayer(players.playerOne);
-    console.log(players);
   }
 
   function changeIconOnSelection(item) {
@@ -109,9 +108,43 @@ const gameControl = (() => {
     }
   }
 
+  const checkForGameWin = (player) => {
+    displayController.resetGame();
+    const winMessage = document.createElement("h2");
+    const mainGame = document.querySelector(".main-game");
+    winMessage.classList.add("win-message");
+    winMessage.textContent = `${player.name} has won!`;
+    document
+      .querySelectorAll(".grid-cell")
+      .forEach((cell) => cell.classList.add("no-events"));
+    // Adding winMessage after mainGame
+    mainGame.parentElement.insertBefore(winMessage, mainGame);
+    setTimeout(playGameAgain.bind(null, winMessage), 2000);
+  };
+
+  const playGameAgain = (winMessage) => {
+    let wantsToPlayAgain = confirm(
+      "The game has ended. Would you like to play again?"
+    );
+    if (wantsToPlayAgain) {
+      players.playerOne.score = 0;
+      players.playerTwo.score = 0;
+      document
+        .querySelectorAll(".grid-cell")
+        .forEach((cell) => cell.classList.remove("no-events"));
+      document.querySelector(".player-one-score").textContent =
+        players.playerOne.score;
+      document.querySelector(".player-two-score").textContent =
+        players.playerTwo.score;
+      winMessage.remove();
+      document.querySelector(".first-player").classList.add("selected");
+      document.querySelector(".second-player").classList.remove("selected");
+    }
+  };
+
   const getPlayers = () => players;
 
-  return { getPlayerData, moveToGame, getPlayers };
+  return { getPlayerData, moveToGame, getPlayers, checkForGameWin };
 })();
 
 gameControl.getPlayerData();
@@ -149,7 +182,7 @@ const gameBoard = (() => {
 
   const checkForRoundDraw = () => {
     const cells = Array.from(document.querySelectorAll(".grid-cell"));
-    return cells.every((cell) => cell.textContent !== "");
+    return cells.every((cell) => cell.textContent);
   };
 
   const checkForCertainDirectionWin = (...args) => {
@@ -254,6 +287,13 @@ const displayController = (() => {
         let activePlayer = gameBoard.getCurrentPlayer();
         if (hasWonRound) {
           performRoundWinFunctions(activePlayer);
+          if (activePlayer.score === 3) {
+            setTimeout(
+              gameControl.checkForGameWin.bind(null, activePlayer),
+              2100
+            );
+          }
+          displayActivePlayer(activePlayer);
         } else if (hasDrawnRound) {
           console.log("Round drawn");
           performRoundDrawFunctions();
@@ -298,7 +338,8 @@ const displayController = (() => {
   const performRoundWinFunctions = (activePlayer) => {
     let winningIndices = gameBoard.getWinningIndices();
     toggleWinningCellsAnimation(winningIndices);
-    updatePlayerScore(activePlayer);
+    activePlayer.score += 1;
+    displayPlayerScore(activePlayer);
     setTimeout(resetGame, 2100);
   };
 
@@ -310,8 +351,7 @@ const displayController = (() => {
     setTimeout(resetGame, 2100);
   };
 
-  const updatePlayerScore = (player) => {
-    player.score += 1;
+  const displayPlayerScore = (player) => {
     if (player.name === "Player One") {
       document.querySelector(".player-one-score").textContent = player.score;
     } else {
@@ -357,7 +397,7 @@ const displayController = (() => {
       .forEach((cell) => (cell.textContent = ""));
     gameBoard.setCurrentPlayer(gameControl.getPlayers().playerOne);
   };
-  return { displayMarkerOnClick };
+  return { displayMarkerOnClick, resetGame };
 })();
 
 displayController.displayMarkerOnClick();
