@@ -181,8 +181,7 @@ const gameBoard = (() => {
   };
 
   const checkForRoundDraw = () => {
-    const cells = Array.from(document.querySelectorAll(".grid-cell"));
-    return cells.every((cell) => cell.textContent);
+    return gameBoardArr.every((item) => item);
   };
 
   const checkForCertainDirectionWin = (...args) => {
@@ -280,8 +279,8 @@ const displayController = (() => {
         e.target.classList.contains("grid-cell") &&
         e.target.textContent === ""
       ) {
-        let gameBoardArr = gameBoard.getGameboardArr();
         gameBoard.populateBoardArr(e.target);
+        let gameBoardArr = gameBoard.getGameboardArr();
         let hasWonRound = gameBoard.checkForRoundWin();
         let hasDrawnRound = gameBoard.checkForRoundDraw();
         let activePlayer = gameBoard.getCurrentPlayer();
@@ -293,15 +292,15 @@ const displayController = (() => {
               2100
             );
           }
-          displayActivePlayer(activePlayer);
+          displayMarker(e.target, gameBoardArr);
         } else if (hasDrawnRound) {
-          console.log("Round drawn");
+          displayMarker(e.target, gameBoardArr);
           performRoundDrawFunctions();
         } else {
           gameBoard.switchCurrentPlayer(e.target);
+          displayMarker(e.target, gameBoardArr);
           displayActivePlayer(activePlayer);
         }
-        displayMarker(e.target, gameBoardArr);
       }
     });
   };
@@ -326,7 +325,8 @@ const displayController = (() => {
   const displayActivePlayer = (currentPlayer) => {
     const firstPlayerDisplay = document.querySelector(".first-player");
     const secondPlayerDisplay = document.querySelector(".second-player");
-    if (currentPlayer.marker === "X") {
+    // Since other player becomes active on clicking of a cell
+    if (currentPlayer.marker === "O") {
       firstPlayerDisplay.classList.add("selected");
       secondPlayerDisplay.classList.remove("selected");
     } else {
@@ -396,6 +396,7 @@ const displayController = (() => {
       .querySelectorAll(".grid-cell")
       .forEach((cell) => (cell.textContent = ""));
     gameBoard.setCurrentPlayer(gameControl.getPlayers().playerOne);
+    displayActivePlayer(gameControl.getPlayers().playerTwo);
   };
   return { displayMarkerOnClick, resetGame };
 })();
