@@ -25,7 +25,7 @@
   --bg-moon: #fdbab9;
   --marker-color: hsl(259, 24%, 44%);
   --bg-cell: #e6e6e6;
-  --bg-cell-hover: #a8a7a7;
+  --bg-cell-hover: #cfcfcf;
 }
 
 .dark-mode {
@@ -42,8 +42,8 @@
   --bg-sun: #ffcb90;
   --bg-moon: #ff8906;
   --marker-color: #f25f4c;
-  --bg-cell: #c3c3c3;
-  --bg-cell-hover: #e0e0e0;
+  --bg-cell: #e0e0e0;
+  --bg-cell-hover: #ffffff;
 }
 
 /* CSS Reset */
@@ -380,7 +380,7 @@ footer a {
 @keyframes draw-ani {
   to {
     scale: 1.1;
-    background-color: goldenrod;
+    background-color: rgb(255, 218, 123);
   }
 }
 
