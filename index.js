@@ -26,6 +26,7 @@ const gameControl = (() => {
     let destination = "game";
     startGameBtn.addEventListener("click", () => {
       changeScreen(destination);
+      displayController.startGame();
     });
   }
 
@@ -108,6 +109,31 @@ const gameControl = (() => {
     }
   }
 
+  const performBotFunctions = (currentPlayer) => {
+    const cells = [...document.querySelectorAll(".grid-cell")];
+    const unmarkedCells = cells.filter((cell) => cell.textContent === "");
+    const randomIndex = Math.floor(Math.random() * unmarkedCells.length);
+    unmarkedCells.forEach((cell, index) => {
+      if (index === randomIndex) {
+        gameBoard.populateBoardArr(cell);
+        cell.textContent = currentPlayer.marker;
+        displayController.showMarkerColor(cell);
+      }
+    });
+    let hasWonRound = gameBoard.checkForRoundWin();
+    let hasDrawnRound = gameBoard.checkForRoundDraw();
+    if (hasWonRound) {
+      displayController.performRoundWinFunctions(currentPlayer);
+      if (currentPlayer.score === 3) {
+        setTimeout(gameControl.checkForGameWin.bind(null, currentPlayer), 2100);
+      }
+    } else if (hasDrawnRound) {
+      displayController.performRoundDrawFunctions();
+    }
+    gameBoard.switchCurrentPlayer();
+    displayController.displayActivePlayer();
+  };
+
   const checkForGameWin = (player) => {
     displayController.resetGame();
     const winMessage = document.createElement("h2");
@@ -144,7 +170,13 @@ const gameControl = (() => {
 
   const getPlayers = () => players;
 
-  return { getPlayerData, moveToGame, getPlayers, checkForGameWin };
+  return {
+    getPlayerData,
+    moveToGame,
+    getPlayers,
+    checkForGameWin,
+    performBotFunctions,
+  };
 })();
 
 gameControl.getPlayerData();
@@ -156,13 +188,11 @@ const gameBoard = (() => {
   let currentPlayer;
   let gameBoardArr = ["", "", "", "", "", "", "", "", ""];
   let winningIndices;
-  const switchCurrentPlayer = (cell) => {
-    if (cell.textContent === "") {
-      if (currentPlayer === players.playerOne) {
-        currentPlayer = players.playerTwo;
-      } else {
-        currentPlayer = players.playerOne;
-      }
+  const switchCurrentPlayer = () => {
+    if (currentPlayer === players.playerOne) {
+      currentPlayer = players.playerTwo;
+    } else {
+      currentPlayer = players.playerOne;
     }
   };
   const populateBoardArr = (cell) => {
@@ -272,8 +302,24 @@ const Player = (type, marker, name) => {
 // Display Control
 
 const displayController = (() => {
-  const displayMarkerOnClick = () => {
+  const startGame = () => {
     const mainGrid = document.querySelector(".main-grid");
+    let playerOne = gameControl.getPlayers().playerOne;
+    let playerTwo = gameControl.getPlayers().playerTwo;
+    const cells = document.querySelectorAll(".grid-cell");
+    if (playerOne.type === "Bot" && playerTwo.type === "Bot") {
+      while (playerOne.score < 4 || playerTwo.score < 4) {
+        let activePlayer = gameBoard.getCurrentPlayer();
+        disableCells(cells, 1000);
+        setTimeout(
+          gameControl.performBotFunctions.bind(null, activePlayer),
+          1000
+        );
+      }
+    } else if (playerOne.type === "Bot") {
+      disableCells(cells, 1100);
+      setTimeout(gameControl.performBotFunctions.bind(null, playerOne), 1000);
+    }
     mainGrid.addEventListener("click", (e) => {
       if (
         e.target.classList.contains("grid-cell") &&
@@ -297,9 +343,17 @@ const displayController = (() => {
           displayMarker(e.target, gameBoardArr);
           performRoundDrawFunctions();
         } else {
-          gameBoard.switchCurrentPlayer(e.target);
+          gameBoard.switchCurrentPlayer();
           displayMarker(e.target, gameBoardArr);
-          displayActivePlayer(activePlayer);
+          displayActivePlayer();
+        }
+        activePlayer = gameBoard.getCurrentPlayer();
+        if (activePlayer.type === "Bot") {
+          disableCells(cells, 1100);
+          setTimeout(
+            gameControl.performBotFunctions.bind(null, activePlayer),
+            1000
+          );
         }
       }
     });
@@ -322,11 +376,11 @@ const displayController = (() => {
     }
   };
 
-  const displayActivePlayer = (currentPlayer) => {
+  const displayActivePlayer = () => {
+    let currentPlayer = gameBoard.getCurrentPlayer();
     const firstPlayerDisplay = document.querySelector(".first-player");
     const secondPlayerDisplay = document.querySelector(".second-player");
-    // Since other player becomes active on clicking of a cell
-    if (currentPlayer.marker === "O") {
+    if (currentPlayer.marker === "X") {
       firstPlayerDisplay.classList.add("selected");
       secondPlayerDisplay.classList.remove("selected");
     } else {
@@ -371,9 +425,13 @@ const displayController = (() => {
       winningCell.classList.add("winning-cell");
       setTimeout(removeWinningClass.bind(null, winningCell), 2100);
     }
-    nonWinningCells.forEach((cell) => {
+    disableCells(nonWinningCells, 2100);
+  };
+
+  const disableCells = (cells, time) => {
+    cells.forEach((cell) => {
       cell.classList.add("no-events");
-      setTimeout(removePointerEvents.bind(null, cell), 2100);
+      setTimeout(removePointerEvents.bind(null, cell), time);
     });
   };
 
@@ -389,16 +447,32 @@ const displayController = (() => {
     cell.classList.remove("draw");
   };
 
+  const checkForBotTurn = (currentPlayer) => {
+    if (currentPlayer.type === "Bot") {
+      gameControl.performBotFunctions(currentPlayer);
+    }
+  };
+
   const resetGame = () => {
     const emptyArr = ["", "", "", "", "", "", "", "", ""];
     gameBoard.setGameboardArr(emptyArr);
     document
       .querySelectorAll(".grid-cell")
       .forEach((cell) => (cell.textContent = ""));
-    gameBoard.setCurrentPlayer(gameControl.getPlayers().playerOne);
-    displayActivePlayer(gameControl.getPlayers().playerTwo);
+    let playerOne = gameControl.getPlayers().playerOne;
+    gameBoard.setCurrentPlayer(playerOne);
+    displayActivePlayer();
+    let currentPlayer = gameBoard.getCurrentPlayer();
+    if (currentPlayer.score < 3) {
+      setTimeout(checkForBotTurn.bind(null, currentPlayer), 1000);
+    }
   };
-  return { displayMarkerOnClick, resetGame };
+  return {
+    startGame,
+    resetGame,
+    showMarkerColor,
+    displayActivePlayer,
+    performRoundDrawFunctions,
+    performRoundWinFunctions,
+  };
 })();
-
-displayController.displayMarkerOnClick();
