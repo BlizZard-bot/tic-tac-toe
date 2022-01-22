@@ -35,4 +35,9 @@ Tic tac toe has 3 main parts:
   Indexes:0 4 8    2 4 6
   No common pattern between indices
 
+## Computer Algorithm and stuff
+
+First check if first player is bot.if its a bot then show marker immediately. If it isn't, then add a function inside the main event listener after the player's turn to instantly add a marker.
+Else if both are bots then, continue the game till one of them loses or wins(score<4)
+
 - the display - Another module updating the display with the required markers and changing the markers after each click. Also, prevent players from placing markers where they are already placed.
