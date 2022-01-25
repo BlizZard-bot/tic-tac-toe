@@ -110,6 +110,7 @@ const gameControl = (() => {
   }
 
   const performBotFunctions = (currentPlayer) => {
+    let hasDrawnRound;
     const cells = [...document.querySelectorAll(".grid-cell")];
     const unmarkedCells = cells.filter((cell) => cell.textContent === "");
     const randomIndex = Math.floor(Math.random() * unmarkedCells.length);
@@ -121,7 +122,9 @@ const gameControl = (() => {
       }
     });
     let hasWonRound = gameBoard.checkForRoundWin();
-    let hasDrawnRound = gameBoard.checkForRoundDraw();
+    if (!hasWonRound) {
+      hasDrawnRound = gameBoard.checkForRoundDraw();
+    }
     if (hasWonRound) {
       displayController.performRoundWinFunctions(currentPlayer);
       if (currentPlayer.score === 3) {
@@ -129,9 +132,10 @@ const gameControl = (() => {
       }
     } else if (hasDrawnRound) {
       displayController.performRoundDrawFunctions();
+    } else {
+      gameBoard.switchCurrentPlayer();
+      displayController.displayActivePlayer();
     }
-    gameBoard.switchCurrentPlayer();
-    displayController.displayActivePlayer();
   };
 
   const checkForGameWin = (player) => {
@@ -306,16 +310,18 @@ const displayController = (() => {
     const mainGrid = document.querySelector(".main-grid");
     let playerOne = gameControl.getPlayers().playerOne;
     let playerTwo = gameControl.getPlayers().playerTwo;
+    let intervalId;
     const cells = document.querySelectorAll(".grid-cell");
     if (playerOne.type === "Bot" && playerTwo.type === "Bot") {
-      while (playerOne.score < 4 || playerTwo.score < 4) {
-        let activePlayer = gameBoard.getCurrentPlayer();
-        disableCells(cells, 1000);
-        setTimeout(
-          gameControl.performBotFunctions.bind(null, activePlayer),
-          1000
-        );
-      }
+      document
+        .querySelectorAll(".grid-cell")
+        .forEach((cell) => cell.classList.add("no-events"));
+      intervalId = setInterval(() => {
+        let currentPlayer = gameBoard.getCurrentPlayer();
+        if (playerOne.score < 3 && playerTwo.score < 3) {
+          gameControl.performBotFunctions(currentPlayer);
+        }
+      }, 2200);
     } else if (playerOne.type === "Bot") {
       disableCells(cells, 1100);
       setTimeout(gameControl.performBotFunctions.bind(null, playerOne), 1000);
@@ -460,13 +466,20 @@ const displayController = (() => {
       .querySelectorAll(".grid-cell")
       .forEach((cell) => (cell.textContent = ""));
     let playerOne = gameControl.getPlayers().playerOne;
+    let playerTwo = gameControl.getPlayers().playerTwo;
     gameBoard.setCurrentPlayer(playerOne);
     displayActivePlayer();
     let currentPlayer = gameBoard.getCurrentPlayer();
-    if (currentPlayer.score < 3) {
+    if (
+      currentPlayer.score < 3 &&
+      (playerOne.type === "Player" || playerTwo.type === "Player")
+    ) {
       setTimeout(checkForBotTurn.bind(null, currentPlayer), 1000);
     }
   };
+
+  const getIntervalId = () => intervalId;
+
   return {
     startGame,
     resetGame,
@@ -474,5 +487,6 @@ const displayController = (() => {
     displayActivePlayer,
     performRoundDrawFunctions,
     performRoundWinFunctions,
+    getIntervalId,
   };
 })();
