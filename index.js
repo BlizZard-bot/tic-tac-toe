@@ -192,6 +192,53 @@ const gameBoard = (() => {
   let currentPlayer;
   let gameBoardArr = ["", "", "", "", "", "", "", "", ""];
   let winningIndices;
+  let staringPlayer = currentPlayer;
+  function miniMax(boardArr, depth) {
+    const possibleMoves = getPossibleMoves(boardArr);
+    let gameEnd = boardArr.checkForRoundWin() || boardArr.checkForRoundDraw();
+    if (gameEnd) {
+      return score(currentPlayer, depth);
+    }
+    depth += 1;
+    let moves = [];
+    let scores = [];
+    let choice;
+    for (let possibleMove of possibleMoves) {
+      scores.push(miniMax(possibleMoves, depth));
+      moves.push(possibleMove);
+    }
+    if (currentPlayer === staringPlayer) {
+      let maxIndex = scores.sort((a, b) => b - a)[0];
+      choice = moves[maxIndex];
+      return scores[maxIndex];
+    } else {
+      let minIndex = scores.sort((a, b) => a - b)[0];
+      choice = moves[minIndex];
+      return scores[minIndex];
+    }
+  }
+
+  function score(currentPlayer, depth) {
+    let otherPlayer = getOtherPlayer(currentPlayer);
+    if (checkForRoundWin(possibleMoves, currentPlayer)) {
+      return 10 - depth;
+    } else if (checkForRoundWin(possibleMoves, otherPlayer)) {
+      return depth - 10;
+    } else {
+      return 0;
+    }
+  }
+
+  const getOtherPlayer = (currentPlayer) => {
+    if (currentPlayer.marker === "X") {
+      return players.playerTwo;
+    } else {
+      return players.playerOne;
+    }
+  };
+
+  const getPossibleMoves = (board) => board.filter((item) => item === "");
+
   const switchCurrentPlayer = () => {
     if (currentPlayer === players.playerOne) {
       currentPlayer = players.playerTwo;
@@ -199,23 +246,29 @@ const gameBoard = (() => {
       currentPlayer = players.playerOne;
     }
   };
+
+  const playMiniMax = () => {
+    miniMax(gameBoardArr, 0);
+    switchCurrentPlayer();
+  };
+
   const populateBoardArr = (cell) => {
     const index = +cell.getAttribute("data-number") - 1;
     gameBoardArr[index] = currentPlayer.marker;
   };
 
-  const checkForRoundWin = () => {
+  const checkForRoundWin = (arr, player) => {
     // Storing whether wins have occurred(true or false) in variables
-    let horizontalWin = checkForHorizontalWin();
-    let verticalWin = checkForVerticalWin();
-    let rightDiagonalWin = checkForRightDiagonalWin();
-    let leftDiagonalWin = checkForLeftDiagonalWin();
+    let horizontalWin = checkForHorizontalWin(arr, player);
+    let verticalWin = checkForVerticalWin(arr, player);
+    let rightDiagonalWin = checkForRightDiagonalWin(arr, player);
+    let leftDiagonalWin = checkForLeftDiagonalWin(arr, player);
     // If one is true return true, otherwise return false
     return horizontalWin || verticalWin || rightDiagonalWin || leftDiagonalWin;
   };
 
-  const checkForRoundDraw = () => {
-    return gameBoardArr.every((item) => item);
+  const checkForRoundDraw = (arr) => {
+    return arr.every((item) => item);
   };
 
   const checkForCertainDirectionWin = (...args) => {
@@ -265,17 +318,17 @@ const gameBoard = (() => {
   // Win conditions for different directions. See Plan.md for further details
   // and illustrations
 
-  const checkForHorizontalWin = () =>
-    checkForCertainDirectionWin(0, 1, 2, 3, gameBoardArr, currentPlayer);
+  const checkForHorizontalWin = (arr, player) =>
+    checkForCertainDirectionWin(0, 1, 2, 3, arr, player);
 
-  const checkForVerticalWin = () =>
-    checkForCertainDirectionWin(0, 3, 6, 1, gameBoardArr, currentPlayer);
+  const checkForVerticalWin = (arr, player) =>
+    checkForCertainDirectionWin(0, 3, 6, 1, arr, player);
 
-  const checkForLeftDiagonalWin = () =>
-    checkForCertainDirectionWin(0, 4, 8, 0, gameBoardArr, currentPlayer);
+  const checkForLeftDiagonalWin = (arr, player) =>
+    checkForCertainDirectionWin(0, 4, 8, 0, arr, player);
 
-  const checkForRightDiagonalWin = () =>
-    checkForCertainDirectionWin(2, 4, 6, 0, gameBoardArr, currentPlayer);
+  const checkForRightDiagonalWin = (arr, player) =>
+    checkForCertainDirectionWin(2, 4, 6, 0, arr, player);
 
   const setPlayers = (playerData) => (players = playerData);
   const setGameboardArr = (arr) => (gameBoardArr = arr);
@@ -295,6 +348,7 @@ const gameBoard = (() => {
     getWinningIndices,
     checkForRoundWin,
     checkForRoundDraw,
+    playMiniMax,
   };
 })();
 

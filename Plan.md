@@ -35,9 +35,36 @@ Tic tac toe has 3 main parts:
   Indexes:0 4 8    2 4 6
   No common pattern between indices
 
-## Computer Algorithm and stuff
+## Computer stuff
 
 First check if first player is bot.if its a bot then show marker immediately. If it isn't, then add a function inside the main event listener after the player's turn to instantly add a marker.
-Else if both are bots then, continue the game till one of them loses or wins(score<4)
+Else if both are bots then, continue the game till one of them loses or wins
+
+### Minimax Algorithm
+
+The minimax algorithm works by calculating the best move by working backwards from the end of the game. It assumes that player one is trying to **maximize their chances of winning** while player two is trying to **minimize their chances of losing**. For example, if player one can win in one move, their best move is that move. If player two knows that there's a move which results in player one winning in one move, while another move will lead to a draw at best, its best move is the one which results in a draw.
+
+The turn taking player would want to pick the move with the maximum score. However, the scores for the moves are determined by the opposing player deciding which move has the minimum score.
+So, the pseudocode would look like:
+
+- If it's a game win, return the score from the currentPlayer
+- Otherwise get all the possible situations for every move
+- Create a scores list 
+- For each situation, add the score to the list
+- If it's X's turn get the maximum score
+- Otherwise, get the minimum score
+
+Obviously the algorithm is recursive
+
+#### Minimax Scenario
+Let's consider this scenario and compute all possible outcomes:
+                1
+             o     x
+             x      
+             x  o  o
+
+   2
+
+
 
 - the display - Another module updating the display with the required markers and changing the markers after each click. Also, prevent players from placing markers where they are already placed.
