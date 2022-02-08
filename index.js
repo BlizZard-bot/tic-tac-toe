@@ -190,54 +190,62 @@ gameControl.moveToGame();
 const gameBoard = (() => {
   let players;
   let currentPlayer;
+  let choice;
   let gameBoardArr = ["", "", "", "", "", "", "", "", ""];
   let winningIndices;
-  let staringPlayer = currentPlayer;
-  function miniMax(boardArr, depth) {
-    const possibleMoves = getPossibleMoves(boardArr);
-    let gameEnd = boardArr.checkForRoundWin() || boardArr.checkForRoundDraw();
+
+  function miniMax(startingPlayer, depth) {
+    const possibleMoves = getPossibleMoves();
+    let gameEnd = checkForRoundWin() || checkForRoundDraw();
     if (gameEnd) {
-      return score(currentPlayer, depth);
+      return score(startingPlayer, depth);
     }
     depth += 1;
     let moves = [];
     let scores = [];
-    let choice;
-    for (let possibleMove of possibleMoves) {
-      scores.push(miniMax(possibleMoves, depth));
-      moves.push(possibleMove);
+    for (let i in possibleMoves) {
+      let currentIndex = possibleMoves[i];
+      if (depth > 1) {
+        switchCurrentPlayer();
+      }
+      gameBoardArr[currentIndex] = currentPlayer.marker;
+      scores.push(miniMax(startingPlayer, depth));
+      moves.push(possibleMoves[i]);
+      gameBoardArr[currentIndex] = "";
+      currentPlayer = depth > 1 ? startingPlayer : currentPlayer;
     }
-    if (currentPlayer === staringPlayer) {
-      let maxIndex = scores.sort((a, b) => b - a)[0];
+    if (currentPlayer === startingPlayer) {
+      let maxIndex = scores.indexOf(Math.max(...scores));
       choice = moves[maxIndex];
       return scores[maxIndex];
     } else {
-      let minIndex = scores.sort((a, b) => a - b)[0];
+      let minIndex = scores.indexOf(Math.min(...scores));
       choice = moves[minIndex];
       return scores[minIndex];
     }
   }
 
-  function score(currentPlayer, depth) {
-    let otherPlayer = getOtherPlayer(currentPlayer);
-    if (checkForRoundWin(possibleMoves, currentPlayer)) {
+  function score(startingPlayer, depth) {
+    if (currentPlayer === startingPlayer && checkForRoundWin()) {
       return 10 - depth;
-    } else if (checkForRoundWin(possibleMoves, otherPlayer)) {
+    } else if (currentPlayer !== startingPlayer && checkForRoundWin()) {
       return depth - 10;
     } else {
       return 0;
     }
   }
 
-  const getOtherPlayer = (currentPlayer) => {
-    if (currentPlayer.marker === "X") {
-      return players.playerTwo;
-    } else {
-      return players.playerOne;
-    }
+  const useMinimax = () => {
+    let startingArray = [...gameBoardArr];
+    let startingPlayer = currentPlayer;
+    miniMax(startingPlayer, 0);
+    gameBoardArr = startingArray;
   };
 
-  const getPossibleMoves = (board) => board.filter((item) => item === "");
+  const getPossibleMoves = () =>
+    gameBoardArr
+      .map((item, index) => (item !== "X" && item !== "O" ? index : null))
+      .filter((item) => item);
 
   const switchCurrentPlayer = () => {
     if (currentPlayer === players.playerOne) {
@@ -247,28 +255,23 @@ const gameBoard = (() => {
     }
   };
 
-  const playMiniMax = () => {
-    miniMax(gameBoardArr, 0);
-    switchCurrentPlayer();
-  };
-
   const populateBoardArr = (cell) => {
     const index = +cell.getAttribute("data-number") - 1;
     gameBoardArr[index] = currentPlayer.marker;
   };
 
-  const checkForRoundWin = (arr, player) => {
+  const checkForRoundWin = () => {
     // Storing whether wins have occurred(true or false) in variables
-    let horizontalWin = checkForHorizontalWin(arr, player);
-    let verticalWin = checkForVerticalWin(arr, player);
-    let rightDiagonalWin = checkForRightDiagonalWin(arr, player);
-    let leftDiagonalWin = checkForLeftDiagonalWin(arr, player);
+    let horizontalWin = checkForHorizontalWin();
+    let verticalWin = checkForVerticalWin();
+    let rightDiagonalWin = checkForRightDiagonalWin();
+    let leftDiagonalWin = checkForLeftDiagonalWin();
     // If one is true return true, otherwise return false
     return horizontalWin || verticalWin || rightDiagonalWin || leftDiagonalWin;
   };
 
-  const checkForRoundDraw = (arr) => {
-    return arr.every((item) => item);
+  const checkForRoundDraw = () => {
+    return gameBoardArr.every((item) => item);
   };
 
   const checkForCertainDirectionWin = (...args) => {
@@ -318,17 +321,17 @@ const gameBoard = (() => {
   // Win conditions for different directions. See Plan.md for further details
   // and illustrations
 
-  const checkForHorizontalWin = (arr, player) =>
-    checkForCertainDirectionWin(0, 1, 2, 3, arr, player);
+  const checkForHorizontalWin = () =>
+    checkForCertainDirectionWin(0, 1, 2, 3, gameBoardArr, currentPlayer);
 
-  const checkForVerticalWin = (arr, player) =>
-    checkForCertainDirectionWin(0, 3, 6, 1, arr, player);
+  const checkForVerticalWin = () =>
+    checkForCertainDirectionWin(0, 3, 6, 1, gameBoardArr, currentPlayer);
 
-  const checkForLeftDiagonalWin = (arr, player) =>
-    checkForCertainDirectionWin(0, 4, 8, 0, arr, player);
+  const checkForLeftDiagonalWin = () =>
+    checkForCertainDirectionWin(0, 4, 8, 0, gameBoardArr, currentPlayer);
 
-  const checkForRightDiagonalWin = (arr, player) =>
-    checkForCertainDirectionWin(2, 4, 6, 0, arr, player);
+  const checkForRightDiagonalWin = () =>
+    checkForCertainDirectionWin(2, 4, 6, 0, gameBoardArr, currentPlayer);
 
   const setPlayers = (playerData) => (players = playerData);
   const setGameboardArr = (arr) => (gameBoardArr = arr);
@@ -336,6 +339,7 @@ const gameBoard = (() => {
   const setCurrentPlayer = (player) => (currentPlayer = player);
   const getCurrentPlayer = () => currentPlayer;
   const getWinningIndices = () => winningIndices;
+  const getChoice = () => choice;
 
   return {
     setGameboardArr,
@@ -348,7 +352,8 @@ const gameBoard = (() => {
     getWinningIndices,
     checkForRoundWin,
     checkForRoundDraw,
-    playMiniMax,
+    useMinimax,
+    getChoice,
   };
 })();
 
@@ -364,7 +369,6 @@ const displayController = (() => {
     const mainGrid = document.querySelector(".main-grid");
     let playerOne = gameControl.getPlayers().playerOne;
     let playerTwo = gameControl.getPlayers().playerTwo;
-    let intervalId;
     const cells = document.querySelectorAll(".grid-cell");
     if (playerOne.type === "Bot" && playerTwo.type === "Bot") {
       document
