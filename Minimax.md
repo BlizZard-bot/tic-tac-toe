@@ -5,11 +5,11 @@ The minimax algorithm works by calculating the best move by working backwards fr
 The turn taking player would want to pick the move with the maximum score. However, the scores for the moves are determined by the opposing player deciding which move has the minimum score.
 So, the basic idea would look like:
 
-- If it's a game win, return the score from the currentPlayer(score should be 10-depth for win and -10-depth for loss)
+- If it's a game win, return the score from the currentPlayer(score should be 10-depth for win and depth-10 for loss)
 - Otherwise get all the possible situations for every move
-- Create a scores array 
-- For each situation, add the score to the array
-- If it's currentPlayer's turn get the maximum score
+- Create a scores array and a moves array
+- For each situation, add the score to the array and the move to the moves array
+- If it's currentPlayer's win get the maximum score
 - Otherwise, get the minimum score
 
 #### Minimax Scenario
