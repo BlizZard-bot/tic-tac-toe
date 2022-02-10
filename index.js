@@ -112,10 +112,12 @@ const gameControl = (() => {
   const performBotFunctions = (currentPlayer) => {
     let hasDrawnRound;
     const cells = [...document.querySelectorAll(".grid-cell")];
-    const unmarkedCells = cells.filter((cell) => cell.textContent === "");
-    const randomIndex = Math.floor(Math.random() * unmarkedCells.length);
-    unmarkedCells.forEach((cell, index) => {
-      if (index === randomIndex) {
+    let startingPlayer = gameBoard.getCurrentPlayer();
+    let startingArray = gameBoard.getGameboardArr();
+    gameBoard.useMinimax(startingPlayer, startingArray);
+    const moveIndex = gameBoard.getChoice();
+    cells.forEach((cell, index) => {
+      if (index === moveIndex) {
         gameBoard.populateBoardArr(cell);
         cell.textContent = currentPlayer.marker;
         displayController.showMarkerColor(cell);
@@ -196,6 +198,11 @@ const gameBoard = (() => {
 
   function miniMax(startingPlayer, depth) {
     const possibleMoves = getPossibleMoves();
+    if (possibleMoves.length > 7) {
+      let randomMove = Math.floor(Math.random() * possibleMoves.length);
+      choice = possibleMoves[randomMove];
+      return;
+    }
     let gameEnd = checkForRoundWin() || checkForRoundDraw();
     if (gameEnd) {
       return score(startingPlayer, depth);
@@ -212,7 +219,6 @@ const gameBoard = (() => {
       scores.push(miniMax(startingPlayer, depth));
       moves.push(possibleMoves[i]);
       gameBoardArr[currentIndex] = "";
-      currentPlayer = depth > 1 ? startingPlayer : currentPlayer;
     }
     if (currentPlayer === startingPlayer) {
       let maxIndex = scores.indexOf(Math.max(...scores));
@@ -235,17 +241,16 @@ const gameBoard = (() => {
     }
   }
 
-  const useMinimax = () => {
-    let startingArray = [...gameBoardArr];
-    let startingPlayer = currentPlayer;
+  const useMinimax = (startingPlayer, startingArray) => {
     miniMax(startingPlayer, 0);
     gameBoardArr = startingArray;
+    currentPlayer = startingPlayer;
   };
 
   const getPossibleMoves = () =>
     gameBoardArr
       .map((item, index) => (item !== "X" && item !== "O" ? index : null))
-      .filter((item) => item);
+      .filter((item) => typeof item === "number");
 
   const switchCurrentPlayer = () => {
     if (currentPlayer === players.playerOne) {
