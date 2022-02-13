@@ -16,7 +16,7 @@ So, the basic idea would look like:
 
 Let us consider this scenario (we are ignoring the depth here):
 
-![Minimax scenario](../../../Pictures/minimax-image.png)
+![Minimax scenario](./Images/minimax-image.png)
 
 - It's X's turn in 1
 - X places its marker at different positions in 2,3 and 4
@@ -26,3 +26,7 @@ Let us consider this scenario (we are ignoring the depth here):
 - 6 and 8 generate the only available moves, which are end , and so both of them add the score of +10 to the move arrays of 3 and 4.
 - Because it is O's turn in both 3 and 4, O will seek to find the minimum score, and given the choice between -10 and +10, both 3 and 4 will yield -10.
 - Finally the score array for 2, 3, and 4 are populated with +10, -10 and -10 respectively, and 1 seeking to maximize the score will chose the winning move with score +10, 2.
+
+#### Credit
+
+The image for the situation was taken from [this blog post](https://www.neverstopbuilding.com/blog/minimax)
