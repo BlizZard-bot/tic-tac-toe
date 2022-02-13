@@ -198,7 +198,7 @@ const gameBoard = (() => {
 
   function miniMax(startingPlayer, depth) {
     const possibleMoves = getPossibleMoves();
-    if (possibleMoves.length > 7) {
+    if (possibleMoves.length === 9) {
       let randomMove = Math.floor(Math.random() * possibleMoves.length);
       choice = possibleMoves[randomMove];
       return;
@@ -211,15 +211,14 @@ const gameBoard = (() => {
     let moves = [];
     let scores = [];
     for (let i in possibleMoves) {
+      computeCurrentPlayer(possibleMoves);
       let currentIndex = possibleMoves[i];
-      if (depth > 1) {
-        switchCurrentPlayer();
-      }
       gameBoardArr[currentIndex] = currentPlayer.marker;
       scores.push(miniMax(startingPlayer, depth));
       moves.push(possibleMoves[i]);
       gameBoardArr[currentIndex] = "";
     }
+    computeCurrentPlayer(possibleMoves);
     if (currentPlayer === startingPlayer) {
       let maxIndex = scores.indexOf(Math.max(...scores));
       choice = moves[maxIndex];
@@ -240,6 +239,18 @@ const gameBoard = (() => {
       return 0;
     }
   }
+
+  const computeCurrentPlayer = (possibleMoves) => {
+    if (isEven(possibleMoves.length)) {
+      currentPlayer = players.playerTwo;
+    } else {
+      currentPlayer = players.playerOne;
+    }
+  };
+
+  const isEven = (num) => {
+    return num % 2 === 0;
+  };
 
   const useMinimax = (startingPlayer, startingArray) => {
     miniMax(startingPlayer, 0);
