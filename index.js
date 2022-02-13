@@ -390,15 +390,14 @@ const displayController = (() => {
       document
         .querySelectorAll(".grid-cell")
         .forEach((cell) => cell.classList.add("no-events"));
-      intervalId = setInterval(() => {
+      setInterval(() => {
         let currentPlayer = gameBoard.getCurrentPlayer();
         if (playerOne.score < 3 && playerTwo.score < 3) {
           gameControl.performBotFunctions(currentPlayer);
         }
       }, 2200);
     } else if (playerOne.type === "Bot") {
-      disableCells(cells, 1100);
-      setTimeout(gameControl.performBotFunctions.bind(null, playerOne), 1000);
+      gameControl.performBotFunctions(playerOne);
     }
     mainGrid.addEventListener("click", (e) => {
       if (
@@ -527,32 +526,23 @@ const displayController = (() => {
     cell.classList.remove("draw");
   };
 
-  const checkForBotTurn = (currentPlayer) => {
-    if (currentPlayer.type === "Bot") {
-      gameControl.performBotFunctions(currentPlayer);
-    }
-  };
-
   const resetGame = () => {
-    const emptyArr = ["", "", "", "", "", "", "", "", ""];
+    const emptyArr = new Array(9).fill("");
     gameBoard.setGameboardArr(emptyArr);
-    document
-      .querySelectorAll(".grid-cell")
-      .forEach((cell) => (cell.textContent = ""));
+    const cells = document.querySelectorAll(".grid-cell");
+    cells.forEach((cell) => (cell.textContent = ""));
     let playerOne = gameControl.getPlayers().playerOne;
-    let playerTwo = gameControl.getPlayers().playerTwo;
     gameBoard.setCurrentPlayer(playerOne);
     displayActivePlayer();
     let currentPlayer = gameBoard.getCurrentPlayer();
-    if (
-      currentPlayer.score < 3 &&
-      (playerOne.type === "Player" || playerTwo.type === "Player")
-    ) {
-      setTimeout(checkForBotTurn.bind(null, currentPlayer), 1000);
+    if (currentPlayer.type === "Bot") {
+      disableCells(cells, 1100);
+      setTimeout(
+        gameControl.performBotFunctions.bind(null, currentPlayer),
+        1000
+      );
     }
   };
-
-  const getIntervalId = () => intervalId;
 
   return {
     startGame,
@@ -561,6 +551,5 @@ const displayController = (() => {
     displayActivePlayer,
     performRoundDrawFunctions,
     performRoundWinFunctions,
-    getIntervalId,
   };
 })();
