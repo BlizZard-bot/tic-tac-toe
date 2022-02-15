@@ -18,7 +18,12 @@ const gameControl = (() => {
   function returnToHomePage() {
     const returnBtn = document.querySelector(".return-btn");
     let destination = "home";
-    returnBtn.addEventListener("click", changeScreen.bind(null, destination));
+    returnBtn.addEventListener("click", () => {
+      changeScreen(destination);
+      gameBoard.resetScores();
+      displayController.resetGame();
+      displayController.displayPlayerScores();
+    });
   }
 
   function moveToGame() {
@@ -151,26 +156,15 @@ const gameControl = (() => {
       .forEach((cell) => cell.classList.add("no-events"));
     // Adding winMessage after mainGame
     mainGame.parentElement.insertBefore(winMessage, mainGame);
-    setTimeout(playGameAgain.bind(null, winMessage), 2000);
+    setTimeout(playGameAgain, 2000);
   };
 
-  const playGameAgain = (winMessage) => {
+  const playGameAgain = () => {
     let wantsToPlayAgain = confirm(
       "The game has ended. Would you like to play again?"
     );
     if (wantsToPlayAgain) {
-      players.playerOne.score = 0;
-      players.playerTwo.score = 0;
-      document
-        .querySelectorAll(".grid-cell")
-        .forEach((cell) => cell.classList.remove("no-events"));
-      document.querySelector(".player-one-score").textContent =
-        players.playerOne.score;
-      document.querySelector(".player-two-score").textContent =
-        players.playerTwo.score;
-      winMessage.remove();
-      document.querySelector(".first-player").classList.add("selected");
-      document.querySelector(".second-player").classList.remove("selected");
+      window.location.reload();
     }
   };
 
@@ -349,6 +343,10 @@ const gameBoard = (() => {
   const checkForRightDiagonalWin = () =>
     checkForCertainDirectionWin(2, 4, 6, 0, gameBoardArr, currentPlayer);
 
+  const resetScores = () => {
+    players.playerOne.score = 0;
+    players.playerTwo.score = 0;
+  };
   const setPlayers = (playerData) => (players = playerData);
   const setGameboardArr = (arr) => (gameBoardArr = arr);
   const getGameboardArr = () => gameBoardArr;
@@ -365,6 +363,7 @@ const gameBoard = (() => {
     setCurrentPlayer,
     getCurrentPlayer,
     setPlayers,
+    resetScores,
     getWinningIndices,
     checkForRoundWin,
     checkForRoundDraw,
@@ -472,7 +471,7 @@ const displayController = (() => {
     let winningIndices = gameBoard.getWinningIndices();
     toggleWinningCellsAnimation(winningIndices);
     activePlayer.score += 1;
-    displayPlayerScore(activePlayer);
+    displayPlayerScores();
     setTimeout(resetGame, 2100);
   };
 
@@ -484,12 +483,11 @@ const displayController = (() => {
     setTimeout(resetGame, 2100);
   };
 
-  const displayPlayerScore = (player) => {
-    if (player.name === "Player One") {
-      document.querySelector(".player-one-score").textContent = player.score;
-    } else {
-      document.querySelector(".player-two-score").textContent = player.score;
-    }
+  const displayPlayerScores = () => {
+    let playerOne = gameControl.getPlayers().playerOne;
+    let playerTwo = gameControl.getPlayers().playerTwo;
+    document.querySelector(".player-one-score").textContent = playerOne.score;
+    document.querySelector(".player-two-score").textContent = playerTwo.score;
   };
 
   const toggleWinningCellsAnimation = (indices) => {
@@ -497,13 +495,13 @@ const displayController = (() => {
     const winningCells = cells.filter((cell) =>
       indices.includes(+cell.getAttribute("data-number") - 1)
     );
-    const nonWinningCells = cells.filter(
-      (cell) => !winningCells.includes(cell)
-    );
     for (let winningCell of winningCells) {
       winningCell.classList.add("winning-cell");
       setTimeout(removeWinningClass.bind(null, winningCell), 2100);
     }
+    const nonWinningCells = cells.filter(
+      (cell) => !winningCells.includes(cell)
+    );
     disableCells(nonWinningCells, 2100);
   };
 
@@ -534,13 +532,9 @@ const displayController = (() => {
     let playerOne = gameControl.getPlayers().playerOne;
     gameBoard.setCurrentPlayer(playerOne);
     displayActivePlayer();
-    let currentPlayer = gameBoard.getCurrentPlayer();
-    if (currentPlayer.type === "Bot") {
+    if (playerOne.type === "Bot" && gameBoard.checkForRoundWin()) {
       disableCells(cells, 1100);
-      setTimeout(
-        gameControl.performBotFunctions.bind(null, currentPlayer),
-        1000
-      );
+      setTimeout(gameControl.performBotFunctions.bind(null, playerOne), 1000);
     }
   };
 
@@ -551,5 +545,6 @@ const displayController = (() => {
     displayActivePlayer,
     performRoundDrawFunctions,
     performRoundWinFunctions,
+    displayPlayerScores,
   };
 })();
