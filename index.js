@@ -29,9 +29,11 @@ const gameControl = (() => {
   function moveToGame() {
     const startGameBtn = document.querySelector(".start-game-btn");
     let destination = "game";
+    const cells = document.querySelectorAll(".grid-cell");
     startGameBtn.addEventListener("click", () => {
       changeScreen(destination);
       displayController.startGame();
+      cells.forEach((cell) => cell.classList.remove("no-events"));
     });
   }
 
@@ -41,12 +43,14 @@ const gameControl = (() => {
     const startingPage = document.querySelector(".starting-page");
     const startGameBtn = document.querySelector(".start-game-btn");
     const gameSection = document.querySelector(".game-section");
+    const winMessage = document.querySelector(".win-message");
     if (destination === "home") {
       helpPrompt.classList.remove("hidden");
       header.classList.remove("hidden");
       startingPage.classList.remove("hidden");
       startGameBtn.classList.remove("hidden");
       gameSection.classList.add("hidden");
+      winMessage.classList.add("hidden");
     } else if (
       destination === "game" &&
       players.playerOne &&
@@ -133,6 +137,9 @@ const gameControl = (() => {
       hasDrawnRound = gameBoard.checkForRoundDraw();
     }
     if (hasWonRound) {
+      document
+        .querySelectorAll(".grid-cell")
+        .forEach((cell) => cell.classList.add("no-events"));
       displayController.performRoundWinFunctions(currentPlayer);
       if (currentPlayer.score === 3) {
         setTimeout(gameControl.checkForGameWin.bind(null, currentPlayer), 2100);
@@ -424,14 +431,14 @@ const displayController = (() => {
           gameBoard.switchCurrentPlayer();
           displayMarker(e.target, gameBoardArr);
           displayActivePlayer();
-        }
-        activePlayer = gameBoard.getCurrentPlayer();
-        if (activePlayer.type === "Bot") {
-          disableCells(cells, 1100);
-          setTimeout(
-            gameControl.performBotFunctions.bind(null, activePlayer),
-            1000
-          );
+          activePlayer = gameBoard.getCurrentPlayer();
+          if (activePlayer.type === "Bot") {
+            disableCells(cells, 1100);
+            setTimeout(
+              gameControl.performBotFunctions.bind(null, activePlayer),
+              1000
+            );
+          }
         }
       }
     });
@@ -491,6 +498,7 @@ const displayController = (() => {
   };
 
   const toggleWinningCellsAnimation = (indices) => {
+    let currentPlayer = gameBoard.getCurrentPlayer();
     const cells = Array.from(document.querySelectorAll(".grid-cell"));
     const winningCells = cells.filter((cell) =>
       indices.includes(+cell.getAttribute("data-number") - 1)
@@ -502,7 +510,9 @@ const displayController = (() => {
     const nonWinningCells = cells.filter(
       (cell) => !winningCells.includes(cell)
     );
-    disableCells(nonWinningCells, 2100);
+    if (currentPlayer.type !== "Bot") {
+      disableCells(nonWinningCells, 2100);
+    }
   };
 
   const disableCells = (cells, time) => {
@@ -525,6 +535,7 @@ const displayController = (() => {
   };
 
   const resetGame = () => {
+    let hasWonRound = gameBoard.checkForRoundWin();
     const emptyArr = new Array(9).fill("");
     gameBoard.setGameboardArr(emptyArr);
     const cells = document.querySelectorAll(".grid-cell");
@@ -532,7 +543,7 @@ const displayController = (() => {
     let playerOne = gameControl.getPlayers().playerOne;
     gameBoard.setCurrentPlayer(playerOne);
     displayActivePlayer();
-    if (playerOne.type === "Bot" && gameBoard.checkForRoundWin()) {
+    if (playerOne.type === "Bot" && hasWonRound && playerOne.score < 3) {
       disableCells(cells, 1100);
       setTimeout(gameControl.performBotFunctions.bind(null, playerOne), 1000);
     }
