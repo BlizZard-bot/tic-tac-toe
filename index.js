@@ -64,9 +64,9 @@ const gameControl = (() => {
     const type = item.textContent;
     styleSelectedButton(item);
     if (marker === "X") {
-      players.playerOne = Player(type, marker, "Player One");
+      players.playerOne = Player(type, marker);
     } else {
-      players.playerTwo = Player(type, marker, "Player Two");
+      players.playerTwo = Player(type, marker);
     }
     gameBoard.setPlayers(players);
     gameBoard.setCurrentPlayer(players.playerOne);
@@ -135,7 +135,7 @@ const gameControl = (() => {
     const winMessage = document.createElement("h2");
     const mainGame = document.querySelector(".main-game");
     winMessage.classList.add("win-message");
-    winMessage.textContent = `${player.name} has won!`;
+    winMessage.textContent = `${player.marker} has won!`;
     document
       .querySelectorAll(".grid-cell")
       .forEach((cell) => cell.classList.add("no-events"));
@@ -358,8 +358,8 @@ const gameBoard = (() => {
 })();
 
 // Player factory
-const Player = (type, marker, name) => {
-  return { type, marker, name, score: 0 };
+const Player = (type, marker) => {
+  return { type, marker, score: 0 };
 };
 
 // Display Control
@@ -508,6 +508,7 @@ const displayController = (() => {
   };
 
   const resetGame = () => {
+    let hasWonRound = gameBoard.checkForRoundWin();
     const emptyArr = new Array(9).fill("");
     gameBoard.setGameboardArr(emptyArr);
     const cells = document.querySelectorAll(".grid-cell");
@@ -515,7 +516,7 @@ const displayController = (() => {
     let playerOne = gameControl.getPlayers().playerOne;
     gameBoard.setCurrentPlayer(playerOne);
     displayActivePlayer();
-    if (playerOne.type === "Bot" && playerOne.score < 3) {
+    if (playerOne.type === "Bot" && hasWonRound && playerOne.score < 3) {
       setTimeout(gameControl.performBotFunctions.bind(null, playerOne), 1000);
     }
   };
