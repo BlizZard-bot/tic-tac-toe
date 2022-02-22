@@ -1,59 +1,12 @@
-(function setTheme() {
-  const darkThemeBtn = document.querySelector(".dark-toggle");
-  const lightThemeBtn = document.querySelector(".light-toggle");
-  darkThemeBtn.addEventListener("click", () => {
-    document.body.classList.add("dark-mode");
-    document.body.classList.remove("light-mode");
-  });
-
-  lightThemeBtn.addEventListener("click", () => {
-    document.body.classList.add("light-mode");
-    document.body.classList.remove("dark-mode");
-  });
-})();
-
-// Main functionality
 const gameControl = (() => {
   const players = {};
-  function enableReturnButton() {
-    const returnBtn = document.querySelector(".return-btn");
-    returnBtn.addEventListener("click", () => {
-      window.location.reload();
-    });
-  }
-
-  function moveToGame() {
-    const startGameBtn = document.querySelector(".start-game-btn");
-    startGameBtn.addEventListener("click", () => {
-      displayGameScreen();
-      displayController.startGame();
-    });
-  }
-
-  function displayGameScreen() {
-    const helpPrompt = document.querySelector(".help-prompt");
-    const header = document.querySelector(".header");
-    const startingPage = document.querySelector(".starting-page");
-    const startGameBtn = document.querySelector(".start-game-btn");
-    const gameSection = document.querySelector(".game-section");
-    if (players.playerOne && players.playerTwo) {
-      helpPrompt.classList.add("hidden");
-      header.classList.add("hidden");
-      startingPage.classList.add("hidden");
-      startGameBtn.classList.add("hidden");
-      gameSection.classList.remove("hidden");
-      enableReturnButton();
-    } else {
-      alert("Select your players first");
-    }
-  }
 
   function getPlayerData() {
     const startingPage = document.querySelector(".starting-page");
     startingPage.addEventListener("click", (e) => {
       if (e.target.textContent === "Player" || e.target.textContent === "Bot") {
         setPlayerData(e.target, players);
-        changeIconOnSelection(e.target);
+        displayController.changeIconOnSelection(e.target);
       }
     });
   }
@@ -62,7 +15,7 @@ const gameControl = (() => {
     const marker =
       item.parentElement.parentElement.firstElementChild.textContent;
     const type = item.textContent;
-    styleSelectedButton(item);
+    displayController.styleSelectedButton(item);
     if (marker === "X") {
       players.playerOne = Player(type, marker);
     } else {
@@ -72,108 +25,93 @@ const gameControl = (() => {
     gameBoard.setCurrentPlayer(players.playerOne);
   }
 
-  function changeIconOnSelection(item) {
-    const icon = item.parentElement.parentElement.querySelector("i");
-    if (item.textContent === "Player") {
-      icon.classList.remove("fa-robot");
-      icon.classList.add("fa-user");
-    } else {
-      icon.classList.add("fa-robot");
-      icon.classList.remove("fa-user");
+  const startGame = () => {
+    const mainGrid = document.querySelector(".main-grid");
+    let playerOne = players.playerOne;
+    let playerTwo = players.playerTwo;
+    if (playerOne.type === "Bot" && playerTwo.type === "Bot") {
+      setInterval(() => {
+        let currentPlayer = gameBoard.getCurrentPlayer();
+        if (playerOne.score < 3 && playerTwo.score < 3) {
+          gameBoard.performBotFunctions(currentPlayer);
+        }
+      }, 2200);
+    } else if (playerOne.type === "Bot") {
+      setTimeout(gameBoard.performBotFunctions.bind(null, playerOne), 1000);
     }
-  }
-
-  function styleSelectedButton(button) {
-    if (
-      button.textContent === "Player" &&
-      !button.classList.contains("selected")
-    ) {
-      button.nextElementSibling.classList.remove("selected");
-      button.classList.add("selected");
-    } else if (
-      button.textContent === "Bot" &&
-      !button.classList.contains("selected")
-    ) {
-      button.previousElementSibling.classList.remove("selected");
-      button.classList.add("selected");
-    }
-  }
-
-  const performBotFunctions = (currentPlayer) => {
-    let hasDrawnRound;
-    const cells = [...document.querySelectorAll(".grid-cell")];
-    let startingPlayer = gameBoard.getCurrentPlayer();
-    let startingArray = gameBoard.getGameboardArr();
-    gameBoard.useMinimax(startingPlayer, startingArray);
-    const moveIndex = gameBoard.getChoice();
-    cells.forEach((cell, index) => {
-      if (index === moveIndex) {
-        gameBoard.populateBoardArr(cell);
-        cell.textContent = currentPlayer.marker;
-        displayController.showMarkerColor(cell);
+    mainGrid.addEventListener("click", (e) => {
+      let currentPlayer = gameBoard.getCurrentPlayer();
+      if (
+        e.target.classList.contains("grid-cell") &&
+        e.target.textContent === "" &&
+        currentPlayer.type !== "Bot"
+      ) {
+        gameBoard.performPlayerFunctions(e);
+        if (gameBoard.isBotTurn()) {
+          currentPlayer = gameBoard.getCurrentPlayer();
+          setTimeout(
+            gameBoard.performBotFunctions.bind(null, currentPlayer),
+            1000
+          );
+        }
       }
     });
-    let hasWonRound = gameBoard.checkForRoundWin();
-    if (!hasWonRound) {
-      hasDrawnRound = gameBoard.checkForRoundDraw();
-    }
-    if (hasWonRound) {
-      displayController.performRoundWinFunctions(currentPlayer);
-      if (currentPlayer.score === 3) {
-        setTimeout(gameControl.checkForGameWin.bind(null, currentPlayer), 2100);
-      }
-    } else if (hasDrawnRound) {
-      displayController.performRoundDrawFunctions();
-    } else {
-      gameBoard.switchCurrentPlayer();
-      displayController.displayActivePlayer();
-    }
-  };
-
-  const checkForGameWin = (player) => {
-    displayController.resetGame();
-    const winMessage = document.createElement("h2");
-    const mainGame = document.querySelector(".main-game");
-    winMessage.classList.add("win-message");
-    winMessage.textContent = `${player.marker} has won!`;
-    document
-      .querySelectorAll(".grid-cell")
-      .forEach((cell) => cell.classList.add("no-events"));
-    // Adding winMessage after mainGame
-    mainGame.parentElement.insertBefore(winMessage, mainGame);
-    setTimeout(playGameAgain, 2000);
-  };
-
-  const playGameAgain = () => {
-    let wantsToPlayAgain = confirm(
-      "The game has ended. Would you like to play again?"
-    );
-    if (wantsToPlayAgain) {
-      window.location.reload();
-    }
   };
 
   const getPlayers = () => players;
 
   return {
     getPlayerData,
-    moveToGame,
     getPlayers,
-    checkForGameWin,
-    performBotFunctions,
+    startGame,
   };
 })();
 
 gameControl.getPlayerData();
-gameControl.moveToGame();
 
-// GameBoard
 const gameBoard = (() => {
   let players;
   let currentPlayer;
   let choice;
   let gameBoardArr = ["", "", "", "", "", "", "", "", ""];
   let winningIndices;
+  const cells = [...document.querySelectorAll(".grid-cell")];
+
+  function performPlayerFunctions(e) {
+    populateBoardArr(e.target);
+    if (isRoundWon()) {
+      performRoundWinFunctions(currentPlayer);
+      setTimeout(performGameWinFunctions.bind(null, currentPlayer), 2100);
+    } else if (isRoundDrawn()) {
+      performRoundDrawFunctions();
+    } else {
+      switchCurrentPlayer();
+    }
+    displayController.displayMarker(e.target, gameBoardArr);
+    displayController.displayActivePlayer();
+  }
+
+  const performBotFunctions = (currentPlayer) => {
+    let startingPlayer = currentPlayer;
+    let startingArray = gameBoardArr;
+    useMinimax(startingPlayer, startingArray);
+    cells.forEach((cell, index) => {
+      if (index === choice) {
+        populateBoardArr(cell);
+        cell.textContent = currentPlayer.marker;
+        displayController.showMarkerColor(cell);
+      }
+    });
+    if (isRoundWon()) {
+      performRoundWinFunctions(currentPlayer);
+      setTimeout(performGameWinFunctions.bind(null, currentPlayer), 2100);
+    } else if (isRoundDrawn()) {
+      performRoundDrawFunctions();
+    } else {
+      switchCurrentPlayer();
+      displayController.displayActivePlayer();
+    }
+  };
 
   function miniMax(startingPlayer, depth) {
     const possibleMoves = getPossibleMoves();
@@ -182,9 +120,9 @@ const gameBoard = (() => {
       choice = possibleMoves[randomMove];
       return;
     }
-    let gameEnd = checkForRoundWin() || checkForRoundDraw();
+    let gameEnd = isRoundWon() || isRoundDrawn();
     if (gameEnd) {
-      return score(startingPlayer, depth);
+      return minimaxScore(startingPlayer, depth);
     }
     depth += 1;
     let moves = [];
@@ -209,10 +147,10 @@ const gameBoard = (() => {
     }
   }
 
-  function score(startingPlayer, depth) {
-    if (currentPlayer === startingPlayer && checkForRoundWin()) {
+  function minimaxScore(startingPlayer, depth) {
+    if (currentPlayer === startingPlayer && isRoundWon()) {
       return 10 - depth;
-    } else if (currentPlayer !== startingPlayer && checkForRoundWin()) {
+    } else if (currentPlayer !== startingPlayer && isRoundWon()) {
       return depth - 10;
     } else {
       return 0;
@@ -251,22 +189,92 @@ const gameBoard = (() => {
   };
 
   const populateBoardArr = (cell) => {
-    const index = +cell.getAttribute("data-number") - 1;
+    const index = +cell.getAttribute("data-index");
     gameBoardArr[index] = currentPlayer.marker;
   };
 
-  const checkForRoundWin = () => {
-    // Storing whether wins have occurred(true or false) in variables
+  const isBotTurn = () => {
+    let otherPlayer;
+    if (currentPlayer === players.playerOne) {
+      otherPlayer = players.playerTwo;
+    } else {
+      otherPlayer = players.playerOne;
+    }
+    if (
+      currentPlayer.type === "Bot" &&
+      currentPlayer.score < 3 &&
+      otherPlayer.type !== "Bot"
+    ) {
+      return true;
+    }
+    return false;
+  };
+
+  const performGameWinFunctions = (player) => {
+    if (player.score === 3) {
+      resetGame();
+      const winMessage = document.createElement("h2");
+      const mainGame = document.querySelector(".main-game");
+      winMessage.classList.add("win-message");
+      winMessage.textContent = `${player.marker} has won!`;
+      document
+        .querySelectorAll(".grid-cell")
+        .forEach((cell) => cell.classList.add("no-events"));
+      // Adding winMessage after mainGame
+      mainGame.parentElement.insertBefore(winMessage, mainGame);
+      setTimeout(playGameAgain, 2000);
+    }
+  };
+
+  const playGameAgain = () => {
+    let wantsToPlayAgain = confirm(
+      "The game has ended. Would you like to play again?"
+    );
+    if (wantsToPlayAgain) {
+      window.location.reload();
+    }
+  };
+
+  const resetGame = () => {
+    gameBoardArr = new Array(9).fill("");
+    cells.forEach((cell) => (cell.textContent = ""));
+    currentPlayer = players.playerOne;
+    displayController.displayActivePlayer();
+    if (gameBoard.isBotTurn()) {
+      setTimeout(
+        gameBoard.performBotFunctions.bind(null, players.playerOne),
+        1000
+      );
+    }
+  };
+
+  const performRoundWinFunctions = (activePlayer) => {
+    displayController.toggleWinningCellsAnimation(winningIndices);
+    activePlayer.score += 1;
+    displayController.displayPlayerScores();
+    setTimeout(resetGame, 2100);
+  };
+
+  const performRoundDrawFunctions = () => {
+    document.querySelectorAll(".grid-cell").forEach((cell) => {
+      cell.classList.add("draw");
+      setTimeout(displayController.removeDrawClass.bind(null, cell), 2100);
+    });
+    setTimeout(resetGame, 2100);
+  };
+
+  const isRoundDrawn = () => {
+    return gameBoardArr.every((item) => item);
+  };
+
+  const isRoundWon = () => {
+    // Storing whether direction wins have occurred(true or false) in variables
     let horizontalWin = checkForHorizontalWin();
     let verticalWin = checkForVerticalWin();
     let rightDiagonalWin = checkForRightDiagonalWin();
     let leftDiagonalWin = checkForLeftDiagonalWin();
     // If one is true return true, otherwise return false
     return horizontalWin || verticalWin || rightDiagonalWin || leftDiagonalWin;
-  };
-
-  const checkForRoundDraw = () => {
-    return gameBoardArr.every((item) => item);
   };
 
   const checkForCertainDirectionWin = (...args) => {
@@ -279,7 +287,8 @@ const gameBoard = (() => {
       arr,
       player,
     ] = args;
-    // Iterating over the loop based on common patterns in win conditions. See Plan.md for details
+    // Iterating over the loop based on common patterns in win conditions.
+    // See win conditions section in README for details
     for (
       let i = firstIteratorVal, j = secondIteratorVal, k = thirdIteratorVal;
       i < arr.length, j < arr.length, k < arr.length;
@@ -313,9 +322,6 @@ const gameBoard = (() => {
     return false;
   };
 
-  // Win conditions for different directions. See Plan.md for further details
-  // and illustrations
-
   const checkForHorizontalWin = () =>
     checkForCertainDirectionWin(0, 1, 2, 3, gameBoardArr, currentPlayer);
 
@@ -328,104 +334,105 @@ const gameBoard = (() => {
   const checkForRightDiagonalWin = () =>
     checkForCertainDirectionWin(2, 4, 6, 0, gameBoardArr, currentPlayer);
 
-  const resetScores = () => {
-    players.playerOne.score = 0;
-    players.playerTwo.score = 0;
-  };
   const setPlayers = (playerData) => (players = playerData);
-  const setGameboardArr = (arr) => (gameBoardArr = arr);
-  const getGameboardArr = () => gameBoardArr;
   const setCurrentPlayer = (player) => (currentPlayer = player);
   const getCurrentPlayer = () => currentPlayer;
-  const getWinningIndices = () => winningIndices;
-  const getChoice = () => choice;
 
   return {
-    setGameboardArr,
-    getGameboardArr,
-    populateBoardArr,
-    switchCurrentPlayer,
     setCurrentPlayer,
     getCurrentPlayer,
     setPlayers,
-    resetScores,
-    getWinningIndices,
-    checkForRoundWin,
-    checkForRoundDraw,
-    useMinimax,
-    getChoice,
+    isBotTurn,
+    performPlayerFunctions,
+    performBotFunctions,
   };
 })();
 
-// Player factory
 const Player = (type, marker) => {
   return { type, marker, score: 0 };
 };
 
-// Display Control
-
 const displayController = (() => {
-  const startGame = () => {
-    const mainGrid = document.querySelector(".main-grid");
-    let playerOne = gameControl.getPlayers().playerOne;
-    let playerTwo = gameControl.getPlayers().playerTwo;
-    const cells = document.querySelectorAll(".grid-cell");
-    if (playerOne.type === "Bot" && playerTwo.type === "Bot") {
-      document
-        .querySelectorAll(".grid-cell")
-        .forEach((cell) => cell.classList.add("no-events"));
-      setInterval(() => {
-        let currentPlayer = gameBoard.getCurrentPlayer();
-        if (playerOne.score < 3 && playerTwo.score < 3) {
-          gameControl.performBotFunctions(currentPlayer);
-        }
-      }, 2200);
-    } else if (playerOne.type === "Bot") {
-      gameControl.performBotFunctions(playerOne);
-    }
-    mainGrid.addEventListener("click", (e) => {
-      let currentPlayer = gameBoard.getCurrentPlayer();
-      if (
-        e.target.classList.contains("grid-cell") &&
-        e.target.textContent === "" &&
-        currentPlayer.type !== "Bot"
-      ) {
-        gameBoard.populateBoardArr(e.target);
-        let gameBoardArr = gameBoard.getGameboardArr();
-        let hasWonRound = gameBoard.checkForRoundWin();
-        let hasDrawnRound = gameBoard.checkForRoundDraw();
-        let activePlayer = gameBoard.getCurrentPlayer();
-        if (hasWonRound) {
-          performRoundWinFunctions(activePlayer);
-          if (activePlayer.score === 3) {
-            setTimeout(
-              gameControl.checkForGameWin.bind(null, activePlayer),
-              2100
-            );
-          }
-          displayMarker(e.target, gameBoardArr);
-        } else if (hasDrawnRound) {
-          displayMarker(e.target, gameBoardArr);
-          performRoundDrawFunctions();
-        } else {
-          gameBoard.switchCurrentPlayer();
-          displayMarker(e.target, gameBoardArr);
-          displayActivePlayer();
-          activePlayer = gameBoard.getCurrentPlayer();
-          if (activePlayer.type === "Bot") {
-            setTimeout(
-              gameControl.performBotFunctions.bind(null, activePlayer),
-              1000
-            );
-          }
-        }
-      }
+  const cells = [...document.querySelectorAll(".grid-cell")];
+
+  function setTheme() {
+    const darkThemeBtn = document.querySelector(".dark-toggle");
+    const lightThemeBtn = document.querySelector(".light-toggle");
+    darkThemeBtn.addEventListener("click", () => {
+      document.body.classList.add("dark-mode");
+      document.body.classList.remove("light-mode");
     });
-  };
+
+    lightThemeBtn.addEventListener("click", () => {
+      document.body.classList.add("light-mode");
+      document.body.classList.remove("dark-mode");
+    });
+  }
+
+  function enableReturnButton() {
+    const returnBtn = document.querySelector(".return-btn");
+    returnBtn.addEventListener("click", () => {
+      window.location.reload();
+    });
+  }
+
+  function enableStartButton() {
+    const startGameBtn = document.querySelector(".start-game-btn");
+    startGameBtn.addEventListener("click", () => {
+      displayGameScreen();
+      gameControl.startGame();
+    });
+  }
+
+  function displayGameScreen() {
+    const players = gameControl.getPlayers();
+    const helpPrompt = document.querySelector(".help-prompt");
+    const header = document.querySelector(".header");
+    const startingPage = document.querySelector(".starting-page");
+    const startGameBtn = document.querySelector(".start-game-btn");
+    const gameSection = document.querySelector(".game-section");
+    if (players.playerOne && players.playerTwo) {
+      helpPrompt.classList.add("hidden");
+      header.classList.add("hidden");
+      startingPage.classList.add("hidden");
+      startGameBtn.classList.add("hidden");
+      gameSection.classList.remove("hidden");
+      enableReturnButton();
+    } else {
+      alert("Select your players first");
+    }
+  }
+
+  function changeIconOnSelection(item) {
+    const icon = item.parentElement.parentElement.querySelector("i");
+    if (item.textContent === "Player") {
+      icon.classList.remove("fa-robot");
+      icon.classList.add("fa-user");
+    } else {
+      icon.classList.add("fa-robot");
+      icon.classList.remove("fa-user");
+    }
+  }
+
+  function styleSelectedButton(button) {
+    if (
+      button.textContent === "Player" &&
+      !button.classList.contains("selected")
+    ) {
+      button.nextElementSibling.classList.remove("selected");
+      button.classList.add("selected");
+    } else if (
+      button.textContent === "Bot" &&
+      !button.classList.contains("selected")
+    ) {
+      button.previousElementSibling.classList.remove("selected");
+      button.classList.add("selected");
+    }
+  }
 
   const displayMarker = (cell, gameBoardArr) => {
     for (let i in gameBoardArr) {
-      if (+cell.getAttribute("data-number") - 1 === +i) {
+      if (+cell.getAttribute("data-index") === +i) {
         cell.textContent = gameBoardArr[i];
         showMarkerColor(cell);
       }
@@ -453,22 +460,6 @@ const displayController = (() => {
     }
   };
 
-  const performRoundWinFunctions = (activePlayer) => {
-    let winningIndices = gameBoard.getWinningIndices();
-    toggleWinningCellsAnimation(winningIndices);
-    activePlayer.score += 1;
-    displayPlayerScores();
-    setTimeout(resetGame, 2100);
-  };
-
-  const performRoundDrawFunctions = () => {
-    document.querySelectorAll(".grid-cell").forEach((cell) => {
-      cell.classList.add("draw");
-      setTimeout(removeDrawClass.bind(null, cell), 2100);
-    });
-    setTimeout(resetGame, 2100);
-  };
-
   const displayPlayerScores = () => {
     let playerOne = gameControl.getPlayers().playerOne;
     let playerTwo = gameControl.getPlayers().playerTwo;
@@ -477,9 +468,8 @@ const displayController = (() => {
   };
 
   const toggleWinningCellsAnimation = (indices) => {
-    const cells = Array.from(document.querySelectorAll(".grid-cell"));
     const winningCells = cells.filter((cell) =>
-      indices.includes(+cell.getAttribute("data-number") - 1)
+      indices.includes(+cell.getAttribute("data-index"))
     );
     for (let winningCell of winningCells) {
       winningCell.classList.add("winning-cell");
@@ -507,27 +497,19 @@ const displayController = (() => {
     cell.classList.remove("draw");
   };
 
-  const resetGame = () => {
-    let hasWonRound = gameBoard.checkForRoundWin();
-    const emptyArr = new Array(9).fill("");
-    gameBoard.setGameboardArr(emptyArr);
-    const cells = document.querySelectorAll(".grid-cell");
-    cells.forEach((cell) => (cell.textContent = ""));
-    let playerOne = gameControl.getPlayers().playerOne;
-    gameBoard.setCurrentPlayer(playerOne);
-    displayActivePlayer();
-    if (playerOne.type === "Bot" && hasWonRound && playerOne.score < 3) {
-      setTimeout(gameControl.performBotFunctions.bind(null, playerOne), 1000);
-    }
-  };
-
   return {
-    startGame,
-    resetGame,
+    setTheme,
+    enableStartButton,
+    changeIconOnSelection,
+    styleSelectedButton,
     showMarkerColor,
     displayActivePlayer,
-    performRoundDrawFunctions,
-    performRoundWinFunctions,
     displayPlayerScores,
+    displayMarker,
+    toggleWinningCellsAnimation,
+    removeDrawClass,
   };
 })();
+
+displayController.setTheme();
+displayController.enableStartButton();
