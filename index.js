@@ -17,9 +17,8 @@ const gameControl = (() => {
   const players = {};
   function returnToHomePage() {
     const returnBtn = document.querySelector(".return-btn");
-    let destination = "home";
     returnBtn.addEventListener("click", () => {
-      changeScreen(destination);
+      changeScreen("home");
       gameBoard.resetScores();
       displayController.resetGame();
       displayController.displayPlayerScores();
@@ -28,10 +27,9 @@ const gameControl = (() => {
 
   function moveToGame() {
     const startGameBtn = document.querySelector(".start-game-btn");
-    let destination = "game";
     const cells = document.querySelectorAll(".grid-cell");
     startGameBtn.addEventListener("click", () => {
-      changeScreen(destination);
+      changeScreen("game");
       displayController.startGame();
       cells.forEach((cell) => cell.classList.remove("no-events"));
     });
@@ -50,7 +48,9 @@ const gameControl = (() => {
       startingPage.classList.remove("hidden");
       startGameBtn.classList.remove("hidden");
       gameSection.classList.add("hidden");
-      winMessage.classList.add("hidden");
+      if (winMessage) {
+        winMessage.classList.add("hidden");
+      }
     } else if (
       destination === "game" &&
       players.playerOne &&
@@ -137,9 +137,6 @@ const gameControl = (() => {
       hasDrawnRound = gameBoard.checkForRoundDraw();
     }
     if (hasWonRound) {
-      document
-        .querySelectorAll(".grid-cell")
-        .forEach((cell) => cell.classList.add("no-events"));
       displayController.performRoundWinFunctions(currentPlayer);
       if (currentPlayer.score === 3) {
         setTimeout(gameControl.checkForGameWin.bind(null, currentPlayer), 2100);
