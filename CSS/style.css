@@ -180,6 +180,8 @@ h6 {
 }
 
 .starting-page {
+  max-width: 1500px;
+  margin-inline: auto;
   place-items: center;
 }
 
