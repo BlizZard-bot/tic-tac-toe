@@ -1,6 +1,10 @@
 const gameControl = (() => {
   const players = {};
 
+  const Player = (type, marker) => {
+    return { type, marker, score: 0 };
+  };
+
   function getPlayerData() {
     const startingPage = document.querySelector(".starting-page");
     startingPage.addEventListener("click", (e) => {
@@ -348,14 +352,10 @@ const gameBoard = (() => {
   };
 })();
 
-const Player = (type, marker) => {
-  return { type, marker, score: 0 };
-};
-
 const displayController = (() => {
   const cells = [...document.querySelectorAll(".grid-cell")];
 
-  function setTheme() {
+  function enableThemeToggle() {
     const darkThemeBtn = document.querySelector(".dark-toggle");
     const lightThemeBtn = document.querySelector(".light-toggle");
     darkThemeBtn.addEventListener("click", () => {
@@ -498,7 +498,7 @@ const displayController = (() => {
   };
 
   return {
-    setTheme,
+    enableThemeToggle,
     enableStartButton,
     changeIconOnSelection,
     styleSelectedButton,
@@ -511,5 +511,5 @@ const displayController = (() => {
   };
 })();
 
-displayController.setTheme();
+displayController.enableThemeToggle();
 displayController.enableStartButton();
