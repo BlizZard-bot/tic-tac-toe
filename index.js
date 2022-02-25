@@ -1,10 +1,6 @@
 const gameControl = (() => {
   const players = {};
 
-  const Player = (type, marker) => {
-    return { type, marker, score: 0 };
-  };
-
   function getPlayerData() {
     const startingPage = document.querySelector(".starting-page");
     startingPage.addEventListener("click", (e) => {
@@ -72,6 +68,10 @@ const gameControl = (() => {
 })();
 
 gameControl.getPlayerData();
+
+const Player = (type, marker) => {
+  return { type, marker, score: 0 };
+};
 
 const gameBoard = (() => {
   let players;
