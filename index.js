@@ -217,26 +217,21 @@ const gameBoard = (() => {
   const performGameWinFunctions = (player) => {
     if (player.score === 3) {
       resetGame();
-      const winMessage = document.createElement("h2");
-      const mainGame = document.querySelector(".main-game");
-      winMessage.classList.add("win-message");
+      const winMessage = document.querySelector(".win-message");
       winMessage.textContent = `${player.marker} has won!`;
       document
         .querySelectorAll(".grid-cell")
         .forEach((cell) => cell.classList.add("no-events"));
-      // Adding winMessage after mainGame
-      mainGame.parentElement.insertBefore(winMessage, mainGame);
       setTimeout(playGameAgain, 2000);
     }
   };
 
   const playGameAgain = () => {
-    let wantsToPlayAgain = confirm(
-      "The game has ended. Would you like to play again?"
-    );
-    if (wantsToPlayAgain) {
+    displayController.displayResetGameModal();
+    const resetGameBtn = document.querySelector(".reset-game-btn");
+    resetGameBtn.addEventListener("click", () => {
       window.location.reload();
-    }
+    });
   };
 
   const resetGame = () => {
@@ -497,6 +492,11 @@ const displayController = (() => {
     cell.classList.remove("draw");
   };
 
+  const displayResetGameModal = () => {
+    const resetGameModal = document.querySelector(".reset-game-modal");
+    resetGameModal.showModal();
+  };
+
   return {
     enableThemeToggle,
     enableStartButton,
@@ -508,6 +508,7 @@ const displayController = (() => {
     displayMarker,
     toggleWinningCellsAnimation,
     removeDrawClass,
+    displayResetGameModal,
   };
 })();
 
