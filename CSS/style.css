@@ -127,11 +127,15 @@ h6 {
   min-height: 100%;
   flex-grow: 1;
   background-color: var(--bg-tertiary);
-  cursor: pointer;
 }
 
 .mode-border {
   border-right: 2px solid var(--border-toggle);
+}
+
+.fa-sun,
+.fa-moon {
+  cursor: pointer;
 }
 
 .fa-sun {
@@ -203,11 +207,6 @@ h6 {
   font-size: var(--step--1);
 }
 
-.win-message {
-  text-align: center;
-  margin-bottom: 0.4em;
-}
-
 .active-player-display {
   display: flex;
   flex-direction: column;
@@ -251,6 +250,31 @@ h6 {
   transition: 0.2s all ease-out;
   transform: scale(1.1);
   background-color: var(--bg-cell-hover);
+}
+
+/* Modal Styles */
+.reset-game-modal {
+  max-width: 50ch;
+  margin: auto;
+  padding: 3em;
+  text-align: center;
+  border-radius: 25px;
+}
+
+.reset-game-modal::backdrop {
+  background-color: var(--color-main);
+  /* background-color: var(--color-main); */
+  opacity: 0.6;
+}
+
+.win-message {
+  /* color: var(--color-heading); */
+  margin-bottom: 0.75em;
+}
+
+.reset-game-btn {
+  color: var(--color-btn-secondary);
+  font-size: var(--step-1);
 }
 
 /* Card styles */
