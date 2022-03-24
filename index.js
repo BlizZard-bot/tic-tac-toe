@@ -353,16 +353,26 @@ const displayController = (() => {
   function enableThemeToggle() {
     const darkThemeBtn = document.querySelector(".dark-toggle");
     const lightThemeBtn = document.querySelector(".light-toggle");
+    const resetGameModal = document.querySelector(".reset-game-modal");
     darkThemeBtn.addEventListener("click", () => {
-      document.body.classList.add("dark-mode");
-      document.body.classList.remove("light-mode");
+      toDarkMode(document.body);
+      toDarkMode(resetGameModal);
     });
 
     lightThemeBtn.addEventListener("click", () => {
-      document.body.classList.add("light-mode");
-      document.body.classList.remove("dark-mode");
+      toLightMode(document.body);
+      toLightMode(resetGameModal);
     });
   }
+  const toLightMode = (element) => {
+    element.classList.remove("dark-mode");
+    element.classList.add("light-mode");
+  };
+
+  const toDarkMode = (element) => {
+    element.classList.remove("light-mode");
+    element.classList.add("dark-mode");
+  };
 
   function enableReturnButton() {
     const returnBtn = document.querySelector(".return-btn");
