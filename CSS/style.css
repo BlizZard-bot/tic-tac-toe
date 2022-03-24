@@ -28,7 +28,7 @@
   --bg-cell-hover: #cfcfcf;
 }
 
-.dark-mode {
+body.dark-mode {
   --bg-body: #0f0e17;
   --color-main: #a7a9be;
   --color-heading: #fffffe;
@@ -261,19 +261,23 @@ h6 {
   border-radius: 25px;
 }
 
-.reset-game-modal::backdrop {
-  background-color: var(--color-main);
-  /* background-color: var(--color-main); */
-  opacity: 0.6;
+.reset-game-modal.light-mode::backdrop {
+  background-color: rgb(0, 0, 0, 0.7);
+}
+
+.reset-game-modal.dark-mode {
+  background-color: #1b1425;
+}
+
+.reset-game-modal.dark-mode::backdrop {
+  background-color: rgb(255, 255, 255, 0.5);
 }
 
 .win-message {
-  /* color: var(--color-heading); */
   margin-bottom: 0.75em;
 }
 
 .reset-game-btn {
-  color: var(--color-btn-secondary);
   font-size: var(--step-1);
 }
 
