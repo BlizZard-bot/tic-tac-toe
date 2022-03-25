@@ -1,4 +1,4 @@
-const gameControl = (() => {
+const gameFlowController = (() => {
   const players = {};
 
   function getPlayerData() {
@@ -236,9 +236,7 @@ const gameBoard = (() => {
       resetGame();
       const winMessage = document.querySelector(".win-message");
       winMessage.textContent = `${player.marker} has won!`;
-      document
-        .querySelectorAll(".grid-cell")
-        .forEach((cell) => cell.classList.add("no-events"));
+      displayController.disableCells(cells, null);
       setTimeout(playGameAgain, 2000);
     }
   };
@@ -253,7 +251,7 @@ const gameBoard = (() => {
 
   const resetGame = () => {
     gameBoardArr = new Array(9).fill("");
-    cells.forEach((cell) => (cell.textContent = ""));
+    displayController.resetCells(cells);
     currentPlayer = players.playerOne;
     displayController.displayActivePlayer();
     if (gameBoard.isBotTurn()) {
@@ -405,12 +403,12 @@ const displayController = (() => {
     const startGameBtn = document.querySelector(".start-game-btn");
     startGameBtn.addEventListener("click", () => {
       displayGameScreen();
-      gameControl.startGame();
+      gameFlowController.startGame();
     });
   }
 
   function displayGameScreen() {
-    const players = gameControl.getPlayers();
+    const players = gameFlowController.getPlayers();
     const helpPrompt = document.querySelector(".help-prompt");
     const header = document.querySelector(".header");
     const startingPage = document.querySelector(".starting-page");
@@ -483,8 +481,8 @@ const displayController = (() => {
   };
 
   const displayPlayerScores = () => {
-    let playerOne = gameControl.getPlayers().playerOne;
-    let playerTwo = gameControl.getPlayers().playerTwo;
+    let playerOne = gameFlowController.getPlayers().playerOne;
+    let playerTwo = gameFlowController.getPlayers().playerTwo;
     document.querySelector(".player-one-score").textContent = playerOne.score;
     document.querySelector(".player-two-score").textContent = playerTwo.score;
   };
@@ -519,6 +517,10 @@ const displayController = (() => {
     cell.classList.remove("draw");
   };
 
+  const resetCells = (cells) => {
+    cells.forEach((cell) => (cell.textContent = ""));
+  };
+
   const displayResetGameModal = () => {
     const resetGameModal = document.querySelector(".reset-game-modal");
     resetGameModal.showModal();
@@ -533,12 +535,14 @@ const displayController = (() => {
     displayActivePlayer,
     displayPlayerScores,
     displayMarker,
+    disableCells,
+    resetCells,
     toggleWinningCellsAnimation,
     removeDrawClass,
     displayResetGameModal,
   };
 })();
 
-gameControl.getPlayerData();
+gameFlowController.getPlayerData();
 displayController.enableThemeToggle();
 displayController.enableStartButton();
