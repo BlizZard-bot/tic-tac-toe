@@ -93,7 +93,8 @@ const gameBoard = (() => {
   const cells = [...document.querySelectorAll(".grid-cell")];
 
   function performPlayerFunctions(e) {
-    populateBoardArr(e.target);
+    let selectedCell = e.target;
+    populateBoardArr(selectedCell);
     if (isRoundWon()) {
       performRoundWinFunctions(currentPlayer);
       setTimeout(performGameWinFunctions.bind(null, currentPlayer), 2100);
@@ -102,7 +103,10 @@ const gameBoard = (() => {
     } else {
       switchCurrentPlayer();
     }
-    displayController.displayMarker(e.target, gameBoardArr);
+    displayController.displayMarker(
+      selectedCell,
+      getgameBoardArrIndex(selectedCell)
+    );
     displayController.displayActivePlayer();
   }
 
@@ -113,8 +117,7 @@ const gameBoard = (() => {
     cells.forEach((cell, index) => {
       if (index === choice) {
         populateBoardArr(cell);
-        cell.textContent = currentPlayer.marker;
-        displayController.showMarkerColor(cell);
+        displayController.displayMarker(cell, index);
       }
     });
     if (isRoundWon()) {
@@ -206,6 +209,14 @@ const gameBoard = (() => {
   const populateBoardArr = (cell) => {
     const index = +cell.getAttribute("data-index");
     gameBoardArr[index] = currentPlayer.marker;
+  };
+
+  const getgameBoardArrIndex = (cell) => {
+    for (let i in gameBoardArr) {
+      if (Number(cell.dataset.index) === Number(i)) {
+        return i;
+      }
+    }
   };
 
   const isBotTurn = () => {
@@ -352,6 +363,9 @@ const gameBoard = (() => {
     setCurrentPlayer,
     getCurrentPlayer,
     setPlayers,
+    get gameBoardArr() {
+      return gameBoardArr;
+    },
     isBotTurn,
     performPlayerFunctions,
     performBotFunctions,
@@ -446,13 +460,10 @@ const displayController = (() => {
     }
   }
 
-  const displayMarker = (cell, gameBoardArr) => {
-    for (let i in gameBoardArr) {
-      if (+cell.getAttribute("data-index") === +i) {
-        cell.textContent = gameBoardArr[i];
-        showMarkerColor(cell);
-      }
-    }
+  const displayMarker = (cell, index) => {
+    const gameBoardArr = gameBoard.gameBoardArr;
+    cell.textContent = gameBoardArr[index];
+    showMarkerColor(cell);
   };
 
   const showMarkerColor = (cell) => {
