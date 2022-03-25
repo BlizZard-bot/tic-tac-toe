@@ -1,13 +1,10 @@
 /* Custom Properties */
 :root {
-  --step--2: clamp(0.69rem, 0.71rem + -0.07vw, 0.58rem);
-  --step--1: clamp(0.83rem, 0.83rem + 0.03vw, 0.88rem);
-  --step-0: clamp(1rem, 0.96rem + 0.19vw, 1.31rem);
-  --step-1: clamp(1.2rem, 1.1rem + 0.46vw, 1.97rem);
-  --step-2: clamp(1.44rem, 1.25rem + 0.91vw, 2.95rem);
-  --step-3: clamp(1.73rem, 1.39rem + 1.62vw, 4.43rem);
-  --step-4: clamp(2.07rem, 1.51rem + 2.74vw, 6.64rem);
-  --step-5: clamp(2.49rem, 1.56rem + 4.48vw, 9.97rem);
+  --fs-small: clamp(0.83rem, 0.83rem + 0.03vw, 0.88rem);
+  --fs-base: clamp(1rem, 0.96rem + 0.19vw, 1.31rem);
+  --fs-large: clamp(1.2rem, 1.1rem + 0.46vw, 1.97rem);
+  --fs-x-large: clamp(1.73rem, 1.39rem + 1.62vw, 4.43rem);
+  --fs-xx-large: clamp(2.49rem, 1.56rem + 4.48vw, 9.97rem);
 }
 
 .light-mode {
@@ -15,7 +12,7 @@
   --color-main: #000;
   --color-heading: #1f1235;
   --color-subheading: #1b1425;
-  --bg-btn: #ff6e6c;
+  --accent-color-orange: #ff6e6c;
   --color-btn: #1f1235;
   --bg-btn-secondary: #ffc5c4;
   --color-btn-secondary: #231d2c;
@@ -23,7 +20,7 @@
   --border-toggle: #1f1235;
   --bg-sun: #ff6e6c;
   --bg-moon: #fdbab9;
-  --marker-color: hsl(259, 24%, 44%);
+  --accent-color-purple: hsl(259, 24%, 44%);
   --bg-cell: #e6e6e6;
   --bg-cell-hover: #cfcfcf;
 }
@@ -33,7 +30,7 @@ body.dark-mode {
   --color-main: #a7a9be;
   --color-heading: #fffffe;
   --color-subheading: #d8d8d7;
-  --bg-btn: #ff8906;
+  --accent-color-orange: #ff8906;
   --color-btn: #fffffe;
   --bg-btn-secondary: #ffbe73aa;
   --color-btn-secondary: #1f1616;
@@ -41,7 +38,7 @@ body.dark-mode {
   --border-toggle: black;
   --bg-sun: #ffcb90;
   --bg-moon: #ff8906;
-  --marker-color: #f25f4c;
+  --accent-color-purple: #f25f4c;
   --bg-cell: #e0e0e0;
   --bg-cell-hover: #ffffff;
 }
@@ -67,7 +64,7 @@ body {
   font-family: "Roboto";
   display: grid;
   padding: 1em;
-  font-size: var(--step-0);
+  font-size: var(--fs-base);
   background-color: var(--bg-body);
 }
 
@@ -100,7 +97,7 @@ h5,
 h6 {
   overflow-wrap: break-word;
   font-family: "Oswald";
-  font-size: var(--step-5);
+  font-size: var(--fs-xx-large);
   color: var(--color-subheading);
 }
 
@@ -158,14 +155,14 @@ h6 {
 }
 
 .main-heading {
-  font-size: var(--step-5);
+  font-size: var(--fs-xx-large);
   color: var(--color-heading);
   font-variant: small-caps;
 }
 
 .help-prompt {
   text-align: center;
-  font-size: var(--step-3);
+  font-size: var(--fs-x-large);
   font-weight: bold;
   font-variant: small-caps;
   margin-block: 1.85em 1em;
@@ -204,7 +201,7 @@ h6 {
   position: absolute;
   left: 1em;
   top: 1em;
-  font-size: var(--step--1);
+  font-size: var(--fs-small);
 }
 
 .active-player-display {
@@ -218,11 +215,11 @@ h6 {
 .active-player-display button {
   border-radius: 10px;
   pointer-events: none;
-  font-size: var(--step-1);
+  font-size: var(--fs-large);
 }
 
 .active-player.active-player {
-  background-color: var(--bg-btn);
+  background-color: var(--accent-color-orange);
   color: var(--color-btn);
 }
 
@@ -236,7 +233,7 @@ h6 {
 
 .main-grid > div {
   aspect-ratio: 1;
-  font-size: var(--step-3);
+  font-size: var(--fs-x-large);
   display: grid;
   place-items: center;
   border-radius: 20px;
@@ -278,7 +275,7 @@ h6 {
 }
 
 .reset-game-btn {
-  font-size: var(--step-1);
+  font-size: var(--fs-large);
 }
 
 /* Card styles */
@@ -296,7 +293,7 @@ h6 {
   padding: 0.35em;
   text-align: center;
   font-size: 2rem;
-  color: var(--marker-color);
+  color: var(--accent-color-purple);
   background-color: #ccc;
   align-self: center;
   font-weight: 800;
@@ -322,7 +319,7 @@ h6 {
 }
 
 .start-game h2 {
-  font-size: var(--step-3);
+  font-size: var(--fs-x-large);
 }
 
 /* Button styles */
@@ -339,7 +336,7 @@ button {
   border: none;
   outline: none;
   border-radius: 10px;
-  background: var(--bg-btn);
+  background: var(--accent-color-orange);
   color: var(--color-btn);
   transition: 0.3s all ease-out;
   cursor: pointer;
@@ -360,13 +357,13 @@ button:focus-visible {
 .btn-secondary:hover,
 .btn-secondary:focus-visible {
   transition: 0.2s all ease-out;
-  background-color: var(--bg-btn);
+  background-color: var(--accent-color-orange);
   color: var(--color-btn);
   transform: scale(1.4);
 }
 
 .selected {
-  background-color: var(--bg-btn);
+  background-color: var(--accent-color-orange);
   color: var(--color-btn);
   transform: scale(1.3);
 }

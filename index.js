@@ -446,9 +446,9 @@ const displayController = (() => {
 
   const showMarkerColor = (cell) => {
     if (cell.textContent === "X") {
-      cell.style.color = "var(--bg-btn)";
+      cell.style.color = "var(--accent-color-orange)";
     } else {
-      cell.style.color = "var(--marker-color)";
+      cell.style.color = "var(--accent-color-purple)";
     }
   };
 
