@@ -11,19 +11,30 @@ const gameControl = (() => {
     });
   }
 
-  function setPlayerData(item, players) {
-    const marker =
-      item.parentElement.parentElement.firstElementChild.textContent;
-    const type = item.textContent;
-    displayController.styleSelectedButton(item);
-    if (marker === "X") {
-      players.playerOne = Player(type, marker);
+  function setPlayerData(button, players) {
+    let playerMarker = getPlayerMarker(button);
+    const type = button.textContent;
+    displayController.styleSelectedButton(button);
+    if (playerMarker === "X") {
+      players.playerOne = Player(type, playerMarker);
     } else {
-      players.playerTwo = Player(type, marker);
+      players.playerTwo = Player(type, playerMarker);
     }
     gameBoard.setPlayers(players);
     gameBoard.setCurrentPlayer(players.playerOne);
   }
+
+  const getPlayerMarker = (button) => {
+    const firstPlayerMarker = document.querySelector(".first-player-selection");
+    const secondPlayerMarker = document.querySelector(
+      ".second-player-selection"
+    );
+    if (button.classList.contains("first-player-btn")) {
+      return firstPlayerMarker.textContent;
+    } else {
+      return secondPlayerMarker.textContent;
+    }
+  };
 
   const startGame = () => {
     const mainGrid = document.querySelector(".main-grid");
