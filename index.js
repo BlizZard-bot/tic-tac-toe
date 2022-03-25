@@ -78,8 +78,6 @@ const gameControl = (() => {
   };
 })();
 
-gameControl.getPlayerData();
-
 const Player = (type, marker) => {
   return { type, marker, score: 0 };
 };
@@ -87,7 +85,7 @@ const Player = (type, marker) => {
 const gameBoard = (() => {
   let players;
   let currentPlayer;
-  let choice;
+  let bestMove;
   let gameBoardArr = ["", "", "", "", "", "", "", "", ""];
   let winningIndices;
   const cells = [...document.querySelectorAll(".grid-cell")];
@@ -95,14 +93,7 @@ const gameBoard = (() => {
   function performPlayerFunctions(e) {
     let selectedCell = e.target;
     populateBoardArr(selectedCell);
-    if (isRoundWon()) {
-      performRoundWinFunctions(currentPlayer);
-      setTimeout(performGameWinFunctions.bind(null, currentPlayer), 2100);
-    } else if (isRoundDrawn()) {
-      performRoundDrawFunctions();
-    } else {
-      switchCurrentPlayer();
-    }
+    checkForRoundEnd();
     displayController.displayMarker(
       selectedCell,
       getgameBoardArrIndex(selectedCell)
@@ -113,29 +104,22 @@ const gameBoard = (() => {
   const performBotFunctions = (currentPlayer) => {
     let startingPlayer = currentPlayer;
     let startingArray = gameBoardArr;
-    useMinimax(startingPlayer, startingArray);
+    findBestMove(startingPlayer, startingArray);
     cells.forEach((cell, index) => {
-      if (index === choice) {
+      if (index === bestMove) {
         populateBoardArr(cell);
         displayController.displayMarker(cell, index);
       }
     });
-    if (isRoundWon()) {
-      performRoundWinFunctions(currentPlayer);
-      setTimeout(performGameWinFunctions.bind(null, currentPlayer), 2100);
-    } else if (isRoundDrawn()) {
-      performRoundDrawFunctions();
-    } else {
-      switchCurrentPlayer();
-      displayController.displayActivePlayer();
-    }
+    checkForRoundEnd();
+    displayController.displayActivePlayer();
   };
 
   function miniMax(startingPlayer, depth) {
     const possibleMoves = getPossibleMoves();
     if (possibleMoves.length === 9) {
       let randomMove = Math.floor(Math.random() * possibleMoves.length);
-      choice = possibleMoves[randomMove];
+      bestMove = possibleMoves[randomMove];
       return;
     }
     let gameEnd = isRoundWon() || isRoundDrawn();
@@ -156,11 +140,11 @@ const gameBoard = (() => {
     computeCurrentPlayer(possibleMoves);
     if (currentPlayer === startingPlayer) {
       let maxIndex = scores.indexOf(Math.max(...scores));
-      choice = moves[maxIndex];
+      bestMove = moves[maxIndex];
       return scores[maxIndex];
     } else {
       let minIndex = scores.indexOf(Math.min(...scores));
-      choice = moves[minIndex];
+      bestMove = moves[minIndex];
       return scores[minIndex];
     }
   }
@@ -187,7 +171,7 @@ const gameBoard = (() => {
     return num % 2 === 0;
   };
 
-  const useMinimax = (startingPlayer, startingArray) => {
+  const findBestMove = (startingPlayer, startingArray) => {
     miniMax(startingPlayer, 0);
     gameBoardArr = startingArray;
     currentPlayer = startingPlayer;
@@ -236,7 +220,18 @@ const gameBoard = (() => {
     return false;
   };
 
-  const performGameWinFunctions = (player) => {
+  const checkForRoundEnd = () => {
+    if (isRoundWon()) {
+      performRoundWinFunctions(currentPlayer);
+      setTimeout(checkForGameWin.bind(null, currentPlayer), 2100);
+    } else if (isRoundDrawn()) {
+      performRoundDrawFunctions();
+    } else {
+      switchCurrentPlayer();
+    }
+  };
+
+  const checkForGameWin = (player) => {
     if (player.score === 3) {
       resetGame();
       const winMessage = document.querySelector(".win-message");
@@ -544,5 +539,6 @@ const displayController = (() => {
   };
 })();
 
+gameControl.getPlayerData();
 displayController.enableThemeToggle();
 displayController.enableStartButton();
